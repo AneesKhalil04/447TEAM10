@@ -1,0 +1,730 @@
+[
+  {
+    "week_start": "2025-10-13",
+    "office": "Emergency Aid Program",
+    "visits": 21,
+    "students_served": 14,
+    "pounds_distributed": 0
+  },
+  {
+    "week_start": "2025-10-20",
+    "office": "Emergency Aid Program",
+    "visits": 20,
+    "students_served": 13,
+    "pounds_distributed": 0
+  },
+  {
+    "week_start": "2025-10-27",
+    "office": "Emergency Aid Program",
+    "visits": 19,
+    "students_served": 13,
+    "pounds_distributed": 0
+  },
+  {
+    "week_start": "2025-11-03",
+    "office": "Emergency Aid Program",
+    "visits": 20,
+    "students_served": 14,
+    "pounds_distributed": 0
+  },
+  {
+    "week_start": "2025-11-10",
+    "office": "Emergency Aid Program",
+    "visits": 24,
+    "students_served": 15,
+    "pounds_distributed": 0
+  },
+  {
+    "week_start": "2025-11-17",
+    "office": "Emergency Aid Program",
+    "visits": 20,
+    "students_served": 14,
+    "pounds_distributed": 0
+  },
+  {
+    "week_start": "2025-11-24",
+    "office": "Emergency Aid Program",
+    "visits": 20,
+    "students_served": 13,
+    "pounds_distributed": 0
+  },
+  {
+    "week_start": "2025-12-01",
+    "office": "Emergency Aid Program",
+    "visits": 32,
+    "students_served": 22,
+    "pounds_distributed": 0
+  },
+  {
+    "week_start": "2025-12-08",
+    "office": "Emergency Aid Program",
+    "visits": 28,
+    "students_served": 20,
+    "pounds_distributed": 0
+  },
+  {
+    "week_start": "2025-12-15",
+    "office": "Emergency Aid Program",
+    "visits": 31,
+    "students_served": 20,
+    "pounds_distributed": 0
+  },
+  {
+    "week_start": "2025-12-22",
+    "office": "Emergency Aid Program",
+    "visits": 5,
+    "students_served": 3,
+    "pounds_distributed": 0
+  },
+  {
+    "week_start": "2025-12-29",
+    "office": "Emergency Aid Program",
+    "visits": 5,
+    "students_served": 3,
+    "pounds_distributed": 0
+  },
+  {
+    "week_start": "2026-01-05",
+    "office": "Emergency Aid Program",
+    "visits": 6,
+    "students_served": 4,
+    "pounds_distributed": 0
+  },
+  {
+    "week_start": "2026-01-12",
+    "office": "Emergency Aid Program",
+    "visits": 6,
+    "students_served": 4,
+    "pounds_distributed": 0
+  },
+  {
+    "week_start": "2026-01-19",
+    "office": "Emergency Aid Program",
+    "visits": 5,
+    "students_served": 3,
+    "pounds_distributed": 0
+  },
+  {
+    "week_start": "2026-01-26",
+    "office": "Emergency Aid Program",
+    "visits": 29,
+    "students_served": 19,
+    "pounds_distributed": 0
+  },
+  {
+    "week_start": "2026-02-02",
+    "office": "Emergency Aid Program",
+    "visits": 24,
+    "students_served": 16,
+    "pounds_distributed": 0
+  },
+  {
+    "week_start": "2026-02-09",
+    "office": "Emergency Aid Program",
+    "visits": 26,
+    "students_served": 17,
+    "pounds_distributed": 0
+  },
+  {
+    "week_start": "2026-02-16",
+    "office": "Emergency Aid Program",
+    "visits": 24,
+    "students_served": 17,
+    "pounds_distributed": 0
+  },
+  {
+    "week_start": "2026-02-23",
+    "office": "Emergency Aid Program",
+    "visits": 26,
+    "students_served": 18,
+    "pounds_distributed": 0
+  },
+  {
+    "week_start": "2026-03-02",
+    "office": "Emergency Aid Program",
+    "visits": 22,
+    "students_served": 14,
+    "pounds_distributed": 0
+  },
+  {
+    "week_start": "2026-03-09",
+    "office": "Emergency Aid Program",
+    "visits": 14,
+    "students_served": 10,
+    "pounds_distributed": 0
+  },
+  {
+    "week_start": "2026-03-16",
+    "office": "Emergency Aid Program",
+    "visits": 14,
+    "students_served": 10,
+    "pounds_distributed": 0
+  },
+  {
+    "week_start": "2026-03-23",
+    "office": "Emergency Aid Program",
+    "visits": 24,
+    "students_served": 15,
+    "pounds_distributed": 0
+  },
+  {
+    "week_start": "2026-03-30",
+    "office": "Emergency Aid Program",
+    "visits": 22,
+    "students_served": 14,
+    "pounds_distributed": 0
+  },
+  {
+    "week_start": "2026-04-06",
+    "office": "Emergency Aid Program",
+    "visits": 21,
+    "students_served": 13,
+    "pounds_distributed": 0
+  },
+  {
+    "week_start": "2026-04-13",
+    "office": "Emergency Aid Program",
+    "visits": 21,
+    "students_served": 15,
+    "pounds_distributed": 0
+  },
+  {
+    "week_start": "2026-04-20",
+    "office": "Emergency Aid Program",
+    "visits": 20,
+    "students_served": 14,
+    "pounds_distributed": 0
+  },
+  {
+    "week_start": "2026-04-27",
+    "office": "Emergency Aid Program",
+    "visits": 22,
+    "students_served": 15,
+    "pounds_distributed": 0
+  },
+  {
+    "week_start": "2026-05-04",
+    "office": "Emergency Aid Program",
+    "visits": 33,
+    "students_served": 24,
+    "pounds_distributed": 0
+  },
+  {
+    "week_start": "2026-05-11",
+    "office": "Emergency Aid Program",
+    "visits": 29,
+    "students_served": 20,
+    "pounds_distributed": 0
+  },
+  {
+    "week_start": "2026-05-18",
+    "office": "Emergency Aid Program",
+    "visits": 20,
+    "students_served": 13,
+    "pounds_distributed": 0
+  },
+  {
+    "week_start": "2026-05-25",
+    "office": "Emergency Aid Program",
+    "visits": 25,
+    "students_served": 17,
+    "pounds_distributed": 0
+  },
+  {
+    "week_start": "2026-06-01",
+    "office": "Emergency Aid Program",
+    "visits": 10,
+    "students_served": 7,
+    "pounds_distributed": 0
+  },
+  {
+    "week_start": "2026-06-08",
+    "office": "Emergency Aid Program",
+    "visits": 9,
+    "students_served": 6,
+    "pounds_distributed": 0
+  },
+  {
+    "week_start": "2026-06-15",
+    "office": "Emergency Aid Program",
+    "visits": 10,
+    "students_served": 7,
+    "pounds_distributed": 0
+  },
+  {
+    "week_start": "2026-06-22",
+    "office": "Emergency Aid Program",
+    "visits": 9,
+    "students_served": 6,
+    "pounds_distributed": 0
+  },
+  {
+    "week_start": "2026-06-29",
+    "office": "Emergency Aid Program",
+    "visits": 9,
+    "students_served": 6,
+    "pounds_distributed": 0
+  },
+  {
+    "week_start": "2026-07-06",
+    "office": "Emergency Aid Program",
+    "visits": 10,
+    "students_served": 7,
+    "pounds_distributed": 0
+  },
+  {
+    "week_start": "2026-07-13",
+    "office": "Emergency Aid Program",
+    "visits": 9,
+    "students_served": 6,
+    "pounds_distributed": 0
+  },
+  {
+    "week_start": "2026-07-20",
+    "office": "Emergency Aid Program",
+    "visits": 11,
+    "students_served": 7,
+    "pounds_distributed": 0
+  },
+  {
+    "week_start": "2026-07-27",
+    "office": "Emergency Aid Program",
+    "visits": 10,
+    "students_served": 7,
+    "pounds_distributed": 0
+  },
+  {
+    "week_start": "2026-08-03",
+    "office": "Emergency Aid Program",
+    "visits": 21,
+    "students_served": 14,
+    "pounds_distributed": 0
+  },
+  {
+    "week_start": "2026-08-10",
+    "office": "Emergency Aid Program",
+    "visits": 22,
+    "students_served": 16,
+    "pounds_distributed": 0
+  },
+  {
+    "week_start": "2026-08-17",
+    "office": "Emergency Aid Program",
+    "visits": 20,
+    "students_served": 14,
+    "pounds_distributed": 0
+  },
+  {
+    "week_start": "2026-08-24",
+    "office": "Emergency Aid Program",
+    "visits": 20,
+    "students_served": 13,
+    "pounds_distributed": 0
+  },
+  {
+    "week_start": "2026-08-31",
+    "office": "Emergency Aid Program",
+    "visits": 23,
+    "students_served": 15,
+    "pounds_distributed": 0
+  },
+  {
+    "week_start": "2026-09-07",
+    "office": "Emergency Aid Program",
+    "visits": 25,
+    "students_served": 17,
+    "pounds_distributed": 0
+  },
+  {
+    "week_start": "2026-09-14",
+    "office": "Emergency Aid Program",
+    "visits": 23,
+    "students_served": 15,
+    "pounds_distributed": 0
+  },
+  {
+    "week_start": "2026-09-21",
+    "office": "Emergency Aid Program",
+    "visits": 30,
+    "students_served": 22,
+    "pounds_distributed": 0
+  },
+  {
+    "week_start": "2026-09-28",
+    "office": "Emergency Aid Program",
+    "visits": 23,
+    "students_served": 15,
+    "pounds_distributed": 0
+  },
+  {
+    "week_start": "2026-10-05",
+    "office": "Emergency Aid Program",
+    "visits": 20,
+    "students_served": 14,
+    "pounds_distributed": 0
+  },
+  {
+    "week_start": "2025-10-13",
+    "office": "Retriever Essentials",
+    "visits": 188,
+    "students_served": 117,
+    "pounds_distributed": 2292
+  },
+  {
+    "week_start": "2025-10-20",
+    "office": "Retriever Essentials",
+    "visits": 165,
+    "students_served": 114,
+    "pounds_distributed": 2485
+  },
+  {
+    "week_start": "2025-10-27",
+    "office": "Retriever Essentials",
+    "visits": 201,
+    "students_served": 126,
+    "pounds_distributed": 2363
+  },
+  {
+    "week_start": "2025-11-03",
+    "office": "Retriever Essentials",
+    "visits": 155,
+    "students_served": 99,
+    "pounds_distributed": 2403
+  },
+  {
+    "week_start": "2025-11-10",
+    "office": "Retriever Essentials",
+    "visits": 154,
+    "students_served": 99,
+    "pounds_distributed": 2472
+  },
+  {
+    "week_start": "2025-11-17",
+    "office": "Retriever Essentials",
+    "visits": 182,
+    "students_served": 117,
+    "pounds_distributed": 2443
+  },
+  {
+    "week_start": "2025-11-24",
+    "office": "Retriever Essentials",
+    "visits": 197,
+    "students_served": 122,
+    "pounds_distributed": 2547
+  },
+  {
+    "week_start": "2025-12-01",
+    "office": "Retriever Essentials",
+    "visits": 248,
+    "students_served": 162,
+    "pounds_distributed": 2905
+  },
+  {
+    "week_start": "2025-12-08",
+    "office": "Retriever Essentials",
+    "visits": 266,
+    "students_served": 174,
+    "pounds_distributed": 2866
+  },
+  {
+    "week_start": "2025-12-15",
+    "office": "Retriever Essentials",
+    "visits": 206,
+    "students_served": 145,
+    "pounds_distributed": 3185
+  },
+  {
+    "week_start": "2025-12-22",
+    "office": "Retriever Essentials",
+    "visits": 49,
+    "students_served": 34,
+    "pounds_distributed": 604
+  },
+  {
+    "week_start": "2025-12-29",
+    "office": "Retriever Essentials",
+    "visits": 51,
+    "students_served": 34,
+    "pounds_distributed": 606
+  },
+  {
+    "week_start": "2026-01-05",
+    "office": "Retriever Essentials",
+    "visits": 49,
+    "students_served": 33,
+    "pounds_distributed": 643
+  },
+  {
+    "week_start": "2026-01-12",
+    "office": "Retriever Essentials",
+    "visits": 46,
+    "students_served": 32,
+    "pounds_distributed": 545
+  },
+  {
+    "week_start": "2026-01-19",
+    "office": "Retriever Essentials",
+    "visits": 41,
+    "students_served": 27,
+    "pounds_distributed": 550
+  },
+  {
+    "week_start": "2026-01-26",
+    "office": "Retriever Essentials",
+    "visits": 199,
+    "students_served": 125,
+    "pounds_distributed": 2752
+  },
+  {
+    "week_start": "2026-02-02",
+    "office": "Retriever Essentials",
+    "visits": 225,
+    "students_served": 148,
+    "pounds_distributed": 2805
+  },
+  {
+    "week_start": "2026-02-09",
+    "office": "Retriever Essentials",
+    "visits": 197,
+    "students_served": 127,
+    "pounds_distributed": 3132
+  },
+  {
+    "week_start": "2026-02-16",
+    "office": "Retriever Essentials",
+    "visits": 226,
+    "students_served": 154,
+    "pounds_distributed": 2691
+  },
+  {
+    "week_start": "2026-02-23",
+    "office": "Retriever Essentials",
+    "visits": 231,
+    "students_served": 147,
+    "pounds_distributed": 2811
+  },
+  {
+    "week_start": "2026-03-02",
+    "office": "Retriever Essentials",
+    "visits": 206,
+    "students_served": 141,
+    "pounds_distributed": 2427
+  },
+  {
+    "week_start": "2026-03-09",
+    "office": "Retriever Essentials",
+    "visits": 104,
+    "students_served": 73,
+    "pounds_distributed": 1393
+  },
+  {
+    "week_start": "2026-03-16",
+    "office": "Retriever Essentials",
+    "visits": 91,
+    "students_served": 57,
+    "pounds_distributed": 1271
+  },
+  {
+    "week_start": "2026-03-23",
+    "office": "Retriever Essentials",
+    "visits": 167,
+    "students_served": 107,
+    "pounds_distributed": 2613
+  },
+  {
+    "week_start": "2026-03-30",
+    "office": "Retriever Essentials",
+    "visits": 200,
+    "students_served": 130,
+    "pounds_distributed": 2475
+  },
+  {
+    "week_start": "2026-04-06",
+    "office": "Retriever Essentials",
+    "visits": 174,
+    "students_served": 124,
+    "pounds_distributed": 2380
+  },
+  {
+    "week_start": "2026-04-13",
+    "office": "Retriever Essentials",
+    "visits": 167,
+    "students_served": 108,
+    "pounds_distributed": 2429
+  },
+  {
+    "week_start": "2026-04-20",
+    "office": "Retriever Essentials",
+    "visits": 167,
+    "students_served": 113,
+    "pounds_distributed": 2591
+  },
+  {
+    "week_start": "2026-04-27",
+    "office": "Retriever Essentials",
+    "visits": 175,
+    "students_served": 112,
+    "pounds_distributed": 2639
+  },
+  {
+    "week_start": "2026-05-04",
+    "office": "Retriever Essentials",
+    "visits": 235,
+    "students_served": 148,
+    "pounds_distributed": 2837
+  },
+  {
+    "week_start": "2026-05-11",
+    "office": "Retriever Essentials",
+    "visits": 207,
+    "students_served": 141,
+    "pounds_distributed": 3302
+  },
+  {
+    "week_start": "2026-05-18",
+    "office": "Retriever Essentials",
+    "visits": 176,
+    "students_served": 110,
+    "pounds_distributed": 2343
+  },
+  {
+    "week_start": "2026-05-25",
+    "office": "Retriever Essentials",
+    "visits": 207,
+    "students_served": 139,
+    "pounds_distributed": 2626
+  },
+  {
+    "week_start": "2026-06-01",
+    "office": "Retriever Essentials",
+    "visits": 90,
+    "students_served": 56,
+    "pounds_distributed": 1128
+  },
+  {
+    "week_start": "2026-06-08",
+    "office": "Retriever Essentials",
+    "visits": 85,
+    "students_served": 57,
+    "pounds_distributed": 1030
+  },
+  {
+    "week_start": "2026-06-15",
+    "office": "Retriever Essentials",
+    "visits": 84,
+    "students_served": 53,
+    "pounds_distributed": 1066
+  },
+  {
+    "week_start": "2026-06-22",
+    "office": "Retriever Essentials",
+    "visits": 80,
+    "students_served": 57,
+    "pounds_distributed": 1161
+  },
+  {
+    "week_start": "2026-06-29",
+    "office": "Retriever Essentials",
+    "visits": 75,
+    "students_served": 50,
+    "pounds_distributed": 1011
+  },
+  {
+    "week_start": "2026-07-06",
+    "office": "Retriever Essentials",
+    "visits": 91,
+    "students_served": 64,
+    "pounds_distributed": 1036
+  },
+  {
+    "week_start": "2026-07-13",
+    "office": "Retriever Essentials",
+    "visits": 84,
+    "students_served": 57,
+    "pounds_distributed": 1005
+  },
+  {
+    "week_start": "2026-07-20",
+    "office": "Retriever Essentials",
+    "visits": 87,
+    "students_served": 59,
+    "pounds_distributed": 1140
+  },
+  {
+    "week_start": "2026-07-27",
+    "office": "Retriever Essentials",
+    "visits": 82,
+    "students_served": 51,
+    "pounds_distributed": 1042
+  },
+  {
+    "week_start": "2026-08-03",
+    "office": "Retriever Essentials",
+    "visits": 154,
+    "students_served": 110,
+    "pounds_distributed": 2582
+  },
+  {
+    "week_start": "2026-08-10",
+    "office": "Retriever Essentials",
+    "visits": 198,
+    "students_served": 129,
+    "pounds_distributed": 2188
+  },
+  {
+    "week_start": "2026-08-17",
+    "office": "Retriever Essentials",
+    "visits": 200,
+    "students_served": 143,
+    "pounds_distributed": 2201
+  },
+  {
+    "week_start": "2026-08-24",
+    "office": "Retriever Essentials",
+    "visits": 179,
+    "students_served": 112,
+    "pounds_distributed": 2525
+  },
+  {
+    "week_start": "2026-08-31",
+    "office": "Retriever Essentials",
+    "visits": 194,
+    "students_served": 123,
+    "pounds_distributed": 2388
+  },
+  {
+    "week_start": "2026-09-07",
+    "office": "Retriever Essentials",
+    "visits": 219,
+    "students_served": 142,
+    "pounds_distributed": 3095
+  },
+  {
+    "week_start": "2026-09-14",
+    "office": "Retriever Essentials",
+    "visits": 211,
+    "students_served": 135,
+    "pounds_distributed": 2903
+  },
+  {
+    "week_start": "2026-09-21",
+    "office": "Retriever Essentials",
+    "visits": 231,
+    "students_served": 148,
+    "pounds_distributed": 2772
+  },
+  {
+    "week_start": "2026-09-28",
+    "office": "Retriever Essentials",
+    "visits": 248,
+    "students_served": 170,
+    "pounds_distributed": 2844
+  },
+  {
+    "week_start": "2026-10-05",
+    "office": "Retriever Essentials",
+    "visits": 181,
+    "students_served": 114,
+    "pounds_distributed": 2268
+  }
+]
