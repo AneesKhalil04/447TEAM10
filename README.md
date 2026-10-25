@@ -35,7 +35,7 @@ Our proposed solution is a Basic Needs Impact Dashboard that:
 | Frontend | React (Vite), Recharts for charts |
 | Backend | Python, FastAPI, SQLAlchemy, Alembic |
 | Database | PostgreSQL |
-| Data ingestion | pandas and openpyxl for CSV/Excel validation |
+| Data ingestion | openpyxl and Python's csv module for CSV/Excel validation |
 | API | REST with JSON, documented through FastAPI's OpenAPI/Swagger |
 | Auth and security | Password hashing, token or session-based login, role-based access control |
 | Deployment | Docker; frontend on Vercel or Netlify; backend and database on a free or low-cost host (to be decided) |
@@ -74,6 +74,15 @@ cp .env.example .env
 alembic upgrade head
 uvicorn app.main:app --reload
 ```
+
+To load the pilot office and try an upload:
+
+```
+docker compose exec backend python -m app.seed
+curl -F data_source_id=1 -F file=@backend/sample_data/upload_sample.csv localhost:8000/uploads
+```
+
+Interactive API docs are at http://localhost:8000/docs. `GET /uploads/template` returns the blank upload template.
 
 After changing a model in `backend/app/models/`, generate a migration with `alembic revision --autogenerate -m "describe the change"`, review the generated file, and commit it with the model change. `pytest` fails if the models and migrations are out of sync.
 

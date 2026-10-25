@@ -14,7 +14,7 @@ Three-tier layered web app: **React SPA (presentation), FastAPI REST API (busine
 | Backend | Python, FastAPI (Pydantic validation, SQLAlchemy ORM, Alembic migrations) | Team's strongest language, auto-generated OpenAPI docs, easy to add pandas for aggregation |
 | Database | PostgreSQL | Relational fit for the model (Office, Service, Service_Usage, Staff_User, Role, Upload_Batch, Data_Source, and others), with constraints and foreign keys |
 | API | REST with JSON, documented through FastAPI's OpenAPI/Swagger. MVP refreshes after each batch upload. Stretch: WebSockets or SSE for live updates. | Real-time pulling from all offices is unrealistic this semester |
-| Data ingestion | Weekly or monthly batch CSV/Excel upload with a standard template and validation (pandas, openpyxl) | Replaces manual spreadsheet tracking. Pantrysoft can export CSV/Excel. |
+| Data ingestion | Weekly or monthly batch CSV/Excel upload with a standard template and validation (openpyxl and Python's csv module) | Replaces manual spreadsheet tracking. Pantrysoft can export CSV/Excel. |
 | Auth and security | Password hashing (argon2 or bcrypt), JWT or session cookies, RBAC enforced in the API layer, audit log, HTTPS, aggregated-by-default views. UMBC SSO (SAML/OIDC) is a stretch goal to confirm with the client. No direct PeopleSoft integration. | Sensitive student data and FERPA concerns |
 | Hosting and deployment | Local host or Docker first (hosting is decided later). Then frontend on Vercel or Netlify, backend and managed Postgres on Render or Railway. | Quick setup with CI/CD from GitHub. Production would need UMBC-approved hosting. |
 | CI/CD | GitHub Actions: lint (ruff, eslint), tests (pytest, Vitest), block merge on failure | Matches the team working agreement |
