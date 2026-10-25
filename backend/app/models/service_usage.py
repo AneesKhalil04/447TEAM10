@@ -4,7 +4,7 @@ from datetime import date
 from decimal import Decimal
 from typing import TYPE_CHECKING, Any
 
-from sqlalchemy import CheckConstraint, ForeignKey, Index, Numeric
+from sqlalchemy import CheckConstraint, ForeignKey, Index, Numeric, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db import Base
@@ -25,6 +25,15 @@ class ServiceUsage(Base):
         CheckConstraint("students_served >= 0", name="students_served_non_negative"),
         CheckConstraint("pounds_distributed >= 0", name="pounds_distributed_non_negative"),
         Index("ix_service_usage_office_id_week_start", "office_id", "week_start"),
+        # One row per office, service and week, so re-uploads must replace rather than
+        # double count. NULLS NOT DISTINCT makes rows with no service collide too (Postgres 15+).
+        UniqueConstraint(
+            "office_id",
+            "service_id",
+            "week_start",
+            name="uq_service_usage_office_id_service_id_week_start",
+            postgresql_nulls_not_distinct=True,
+        ),
     )
 
     id: Mapped[int] = mapped_column(primary_key=True)

@@ -89,3 +89,28 @@ def test_deleting_a_batch_removes_its_usage_rows(db: Session) -> None:
     db.delete(batch)
     db.commit()
     assert db.scalar(select(func.count()).select_from(ServiceUsage)) == 0
+
+
+def test_same_office_service_and_week_cannot_be_stored_twice(db: Session) -> None:
+    batch = make_batch(db)
+    pantry = Service(office=batch.data_source.office, name="Food pantry")
+    db.add(make_usage(batch, service=pantry))
+    db.commit()
+
+    later_batch = UploadBatch(data_source=batch.data_source, filename="week1-fixed.csv")
+    db.add(later_batch)
+    db.add(make_usage(later_batch, service=pantry))
+    with pytest.raises(IntegrityError):
+        db.commit()
+
+
+def test_same_week_is_allowed_for_different_services(db: Session) -> None:
+    batch = make_batch(db)
+    office = batch.data_source.office
+    db.add_all(
+        [
+            make_usage(batch, service=Service(office=office, name="Food pantry")),
+            make_usage(batch, service=Service(office=office, name="Emergency aid")),
+        ]
+    )
+    db.commit()

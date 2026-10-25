@@ -73,7 +73,8 @@ def upgrade() -> None:
     sa.ForeignKeyConstraint(['office_id'], ['office.id'], name=op.f('fk_service_usage_office_id_office'), ondelete='RESTRICT'),
     sa.ForeignKeyConstraint(['service_id'], ['service.id'], name=op.f('fk_service_usage_service_id_service'), ondelete='RESTRICT'),
     sa.ForeignKeyConstraint(['upload_batch_id'], ['upload_batch.id'], name=op.f('fk_service_usage_upload_batch_id_upload_batch'), ondelete='CASCADE'),
-    sa.PrimaryKeyConstraint('id', name=op.f('pk_service_usage'))
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_service_usage')),
+    sa.UniqueConstraint('office_id', 'service_id', 'week_start', name='uq_service_usage_office_id_service_id_week_start', postgresql_nulls_not_distinct=True)
     )
     with op.batch_alter_table('service_usage', schema=None) as batch_op:
         batch_op.create_index('ix_service_usage_office_id_week_start', ['office_id', 'week_start'], unique=False)
