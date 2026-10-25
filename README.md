@@ -54,6 +54,29 @@ docs/              Requirements and design documents
 .github/workflows/ CI configuration
 ```
 
+## Running the Backend Locally
+
+Start Postgres and the API with Docker. Migrations run automatically when the API container starts.
+
+```
+docker compose up --build
+```
+
+To run the API outside Docker, start only the database and apply migrations yourself:
+
+```
+docker compose up -d db
+cd backend
+python -m venv .venv
+.venv/Scripts/activate        # macOS/Linux: source .venv/bin/activate
+pip install -r requirements-dev.txt
+cp .env.example .env
+alembic upgrade head
+uvicorn app.main:app --reload
+```
+
+After changing a model in `backend/app/models/`, generate a migration with `alembic revision --autogenerate -m "describe the change"`, review the generated file, and commit it with the model change. `pytest` fails if the models and migrations are out of sync.
+
 ## Team Workflow
 
 - Feature branches and pull requests; no direct commits to `main`
