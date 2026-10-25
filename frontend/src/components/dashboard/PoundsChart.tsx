@@ -1,5 +1,5 @@
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import type { WeeklyTotal } from "./utils";
+import type { WeeklyTotal } from "../../types/dashboard";
 import { formatFullDate, formatWeekLabel } from "./utils";
 
 interface PoundsChartProps {

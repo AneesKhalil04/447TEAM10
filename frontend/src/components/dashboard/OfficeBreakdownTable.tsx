@@ -1,4 +1,4 @@
-import type { OfficeTotal } from "./utils";
+import type { OfficeTotal } from "../../types/dashboard";
 
 interface OfficeBreakdownTableProps {
   totals: OfficeTotal[];
@@ -19,7 +19,7 @@ function OfficeBreakdownTable({ totals }: OfficeBreakdownTableProps) {
       </thead>
       <tbody>
         {totals.map((row) => (
-          <tr key={row.office}>
+          <tr key={row.office_id}>
             <td>{row.office}</td>
             <td className="num">{numberFormatter.format(row.visits)}</td>
             <td className="num">{numberFormatter.format(row.students_served)}</td>

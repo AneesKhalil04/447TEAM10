@@ -5,6 +5,8 @@
   --chart-axis: #bdbdbd;
   --chart-label: #6b6b6b;
   --chart-accent-2: #3a3a3a;
+  --alert-bg: #fff4f2;
+  --alert-line: #e8b4ab;
 
   display: flex;
   flex-direction: column;
@@ -184,6 +186,37 @@
 .office-table th.num,
 .office-table td.num {
   text-align: right;
+}
+
+.dash-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.dash-body[aria-busy="true"] .dash-kpis,
+.dash-body[aria-busy="true"] .dash-grid {
+  opacity: 0.6;
+  transition: opacity 0.15s;
+}
+
+.dash-status {
+  margin: 0;
+  color: var(--chart-label);
+  font-size: 0.85rem;
+}
+
+.dash-alert {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: var(--alert-bg);
+  border: 1px solid var(--alert-line);
+  border-radius: 8px;
+  font-size: 0.9rem;
 }
 
 .dash-footnote {

@@ -86,6 +86,18 @@ Interactive API docs are at http://localhost:8000/docs. `GET /uploads/template` 
 
 After changing a model in `backend/app/models/`, generate a migration with `alembic revision --autogenerate -m "describe the change"`, review the generated file, and commit it with the model change. `pytest` fails if the models and migrations are out of sync.
 
+## Running the Frontend Locally
+
+The dashboard reads its numbers from the API, so start the backend first (see above) and load some data with the seed and upload commands.
+
+```
+cd frontend
+npm install
+npm run dev
+```
+
+Open http://localhost:5173. The API address defaults to `http://localhost:8000`. To point at a different API, copy `frontend/.env.example` to `frontend/.env.local` and change `VITE_API_URL`.
+
 ## Team Workflow
 
 - Feature branches and pull requests; no direct commits to `main`
