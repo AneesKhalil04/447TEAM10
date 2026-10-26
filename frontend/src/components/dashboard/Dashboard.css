@@ -194,6 +194,52 @@
   max-width: 72ch;
 }
 
+.upload-section h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1.1rem;
+}
+
+.upload-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.upload-actions input {
+  font: inherit;
+  max-width: 100%;
+}
+
+.upload-actions input::file-selector-button {
+  font: inherit;
+  background: var(--umbc-gold);
+  color: var(--umbc-black);
+  border: 1px solid var(--umbc-black);
+  border-radius: 6px;
+  padding: 0.4rem 0.6rem;
+  cursor: pointer;
+}
+
+.upload-template {
+  color: var(--umbc-black);
+  text-decoration: none;
+}
+
+.upload-error {
+  color: #c53030;
+  white-space: pre-line;
+}
+
+.upload-preview-scroll {
+  overflow-x: auto;
+}
+
+.upload-preview-scroll caption {
+  text-align: left;
+  margin-bottom: 0.5rem;
+}
+
 @media (max-width: 480px) {
   .dash-page {
     padding: 1rem 0.75rem 2rem;

@@ -1,11 +1,13 @@
 import { useMemo, useState } from "react";
 import { sampleServiceUsage } from "../../data/sampleServiceUsage";
 import type { ServiceUsageRow } from "../../types/serviceUsage";
+import type { UploadResponse } from "../../types/upload";
 import DashboardFiltersBar from "./DashboardFiltersBar";
 import KpiCard from "./KpiCard";
 import OfficeBreakdownTable from "./OfficeBreakdownTable";
 import PoundsChart from "./PoundsChart";
 import TrendChart from "./TrendChart";
+import UploadAggregatedData from "./UploadAggregatedData";
 import "./Dashboard.css";
 import {
   filterRows,
@@ -24,8 +26,28 @@ interface DashboardProps {
 
 const EMPTY_FILTERS: DashboardFilters = { office: null, start: null, end: null };
 
-function Dashboard({ rows = sampleServiceUsage }: DashboardProps) {
+function Dashboard({ rows: initialRows = sampleServiceUsage }: DashboardProps) {
+  const [uploadedRows, setUploadedRows] = useState<ServiceUsageRow[] | null>(null);
+  const [uploadKey, setUploadKey] = useState(0);
+  const rows = uploadedRows ?? initialRows;
   const [filters, setFilters] = useState<DashboardFilters>(EMPTY_FILTERS);
+
+  function loadDashboard(response: UploadResponse) {
+    setUploadedRows(response.records.map((record) => ({
+      office: record.office,
+      week_start: record.period_start,
+      visits: record.visits,
+      students_served: record.students_served,
+      pounds_distributed: record.pounds_distributed,
+    })));
+    setFilters(EMPTY_FILTERS);
+  }
+
+  function restoreSampleData() {
+    setUploadedRows(null);
+    setFilters(EMPTY_FILTERS);
+    setUploadKey((key) => key + 1);
+  }
 
   const offices = useMemo(() => listOffices(rows), [rows]);
   const sortedWeeks = useMemo(() => Array.from(new Set(rows.map((row) => row.week_start))).sort(), [rows]);
@@ -49,7 +71,7 @@ function Dashboard({ rows = sampleServiceUsage }: DashboardProps) {
   const windowLabel =
     filters.start || filters.end
       ? `${filters.start ? formatFullDate(filters.start) : "start"} to ${filters.end ? formatFullDate(filters.end) : "now"}`
-      : "full sample period";
+      : uploadedRows ? "full uploaded period" : "full sample period";
   const officeLabel = filters.office ?? "all offices";
   const takeaway = filtered.length
     ? `${visits.toLocaleString()} visits served ${studentsServed.toLocaleString()} students and moved ${poundsDistributed.toLocaleString()} lb of food across ${officeLabel}, ${windowLabel}.`
@@ -62,6 +84,15 @@ function Dashboard({ rows = sampleServiceUsage }: DashboardProps) {
         <h1>Retriever Essentials Impact Dashboard</h1>
         <p className="dash-takeaway">{takeaway}</p>
       </header>
+
+      <UploadAggregatedData key={uploadKey} onLoad={loadDashboard} />
+      {uploadedRows && (
+        <div>
+          <p>Dashboard source: accepted CSV data for this session only. Not saved to the database.</p>
+          <p className="card-note">Charts and date filters use period start dates. Students served totals may count repeat students across periods or offices.</p>
+          <button type="button" className="reset-button" onClick={restoreSampleData}>Restore Sample Data</button>
+        </div>
+      )}
 
       <DashboardFiltersBar
         offices={offices}
@@ -92,19 +123,19 @@ function Dashboard({ rows = sampleServiceUsage }: DashboardProps) {
       </div>
 
       <div className="dash-card">
-        <div className="card-title">Office breakdown &mdash; full sample period</div>
+        <div className="card-title">Office breakdown &mdash; {uploadedRows ? "full uploaded period" : "full sample period"}</div>
         <div className="card-note">
-          Totals across the whole sample, independent of the filters above, to compare offices. Only Retriever
+          Totals across the {uploadedRows ? "accepted upload" : "whole sample"}, independent of the filters above, to compare offices. {!uploadedRows && <>Only Retriever
           Essentials is part of the current pilot; Emergency Aid Program is shown to illustrate how a second office
-          looks once the data model is extended.
+          looks once the data model is extended.</>}
         </div>
         <OfficeBreakdownTable totals={breakdown} />
       </div>
 
       <footer className="dash-footnote">
-        Sample data for design review, generated to match the planned Service_Usage upload columns (office, week,
-        visits, students served, pounds distributed). It is not connected to a real office upload yet, and the
-        login and role-based access control screens are not part of this preview.
+        {uploadedRows ? "Accepted CSV data is loaded for this session only and is not saved to the database. Login and role-based access control are not implemented." : <>Sample data for design review, generated to match the planned Service_Usage upload columns (office, week,
+        visits, students served, pounds distributed). Select an aggregated CSV above to validate and load your
+        own session data. Login and role-based access control are not implemented.</>}
       </footer>
     </main>
   );
