@@ -84,6 +84,22 @@
   border-color: var(--umbc-gold);
 }
 
+.primary-button {
+  font: inherit;
+  font-weight: 600;
+  padding: 0.45rem 1.1rem;
+  border: 1px solid var(--umbc-gold);
+  border-radius: 6px;
+  background: var(--umbc-gold);
+  color: var(--umbc-black);
+  cursor: pointer;
+}
+
+.primary-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .dash-kpis {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
@@ -231,4 +247,12 @@
   .dash-page {
     padding: 1rem 0.75rem 2rem;
   }
+}
+
+.dash-header-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
 }

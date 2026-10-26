@@ -6,6 +6,7 @@ import KpiCard from "./KpiCard";
 import OfficeBreakdownTable from "./OfficeBreakdownTable";
 import PoundsChart from "./PoundsChart";
 import TrendChart from "./TrendChart";
+import UploadPanel from "../upload/UploadPanel";
 import "./Dashboard.css";
 import { formatFullDate } from "./utils";
 
@@ -21,6 +22,7 @@ function Dashboard({ fetchSummary = fetchDashboardSummary }: DashboardProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [attempt, setAttempt] = useState(0);
+  const [showUpload, setShowUpload] = useState(false);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -41,14 +43,28 @@ function Dashboard({ fetchSummary = fetchDashboardSummary }: DashboardProps) {
   }, [fetchSummary, filters, attempt]);
 
   const retry = () => setAttempt((count) => count + 1);
+  // With nothing uploaded yet, the upload form is the only useful thing on the page.
+  const uploadOpen = showUpload || summary?.data_range === null;
 
   return (
     <main className="dash-page">
       <header className="dash-header">
         <p className="dash-eyebrow">Dean of Students &middot; Basic Needs Impact</p>
-        <h1>Retriever Essentials Impact Dashboard</h1>
+        <div className="dash-header-row">
+          <h1>Retriever Essentials Impact Dashboard</h1>
+          <button
+            type="button"
+            className="primary-button"
+            aria-expanded={uploadOpen}
+            onClick={() => setShowUpload((open) => !open)}
+          >
+            {uploadOpen ? "Close upload" : "Upload data"}
+          </button>
+        </div>
         {summary && <p className="dash-takeaway">{takeaway(summary, filters)}</p>}
       </header>
+
+      {uploadOpen && <UploadPanel onUploaded={retry} />}
 
       {error && (
         <div className="dash-alert" role="alert">
