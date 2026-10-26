@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { fetchDashboardSummary, type DashboardFilters } from "../../api/dashboard";
-import type { DashboardSummary } from "../../types/dashboard";
+import type { DashboardSummary, Totals } from "../../types/dashboard";
 import DashboardFiltersBar from "./DashboardFiltersBar";
 import KpiCard from "./KpiCard";
 import OfficeBreakdownTable from "./OfficeBreakdownTable";
 import PoundsChart from "./PoundsChart";
 import TrendChart from "./TrendChart";
+import UploadChangeNote from "./UploadChangeNote";
 import UploadPanel from "../upload/UploadPanel";
 import "./Dashboard.css";
 import { formatFullDate } from "./utils";
@@ -23,6 +24,7 @@ function Dashboard({ fetchSummary = fetchDashboardSummary }: DashboardProps) {
   const [error, setError] = useState<string | null>(null);
   const [attempt, setAttempt] = useState(0);
   const [showUpload, setShowUpload] = useState(false);
+  const [totalsBeforeUpload, setTotalsBeforeUpload] = useState<Totals | null>(null);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -43,6 +45,16 @@ function Dashboard({ fetchSummary = fetchDashboardSummary }: DashboardProps) {
   }, [fetchSummary, filters, attempt]);
 
   const retry = () => setAttempt((count) => count + 1);
+  const changeFilters = (next: DashboardFilters) => {
+    setTotalsBeforeUpload(null);
+    setFilters(next);
+  };
+  const handleUploaded = () => {
+    // Remember what was on screen so the refreshed totals can be compared against it.
+    setTotalsBeforeUpload(summary?.totals ?? null);
+    setLoading(true);
+    retry();
+  };
   // With nothing uploaded yet, the upload form is the only useful thing on the page.
   const uploadOpen = showUpload || summary?.data_range === null;
 
@@ -64,7 +76,15 @@ function Dashboard({ fetchSummary = fetchDashboardSummary }: DashboardProps) {
         {summary && <p className="dash-takeaway">{takeaway(summary, filters)}</p>}
       </header>
 
-      {uploadOpen && <UploadPanel onUploaded={retry} />}
+      {uploadOpen && <UploadPanel onUploaded={handleUploaded} />}
+
+      {summary && !loading && totalsBeforeUpload && (
+        <UploadChangeNote
+          before={totalsBeforeUpload}
+          after={summary.totals}
+          onDismiss={() => setTotalsBeforeUpload(null)}
+        />
+      )}
 
       {error && (
         <div className="dash-alert" role="alert">
@@ -88,8 +108,8 @@ function Dashboard({ fetchSummary = fetchDashboardSummary }: DashboardProps) {
             filters={filters}
             minDate={summary.data_range?.start ?? ""}
             maxDate={summary.data_range?.end ?? ""}
-            onChange={setFilters}
-            onReset={() => setFilters(EMPTY_FILTERS)}
+            onChange={changeFilters}
+            onReset={() => changeFilters(EMPTY_FILTERS)}
           />
           {loading && (
             <p className="dash-status" role="status">
