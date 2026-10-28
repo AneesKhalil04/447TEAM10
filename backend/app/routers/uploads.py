@@ -2,16 +2,18 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, File, Form, UploadFile, status
 from fastapi.responses import JSONResponse, Response
+from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.db import get_db
-from app.models import DataSource
+from app.models import DataSource, Office, ServiceUsage, UploadBatch
 from app.schemas.upload import (
     ConflictOut,
     RowErrorOut,
     UploadConflictResponse,
     UploadErrorResponse,
+    UploadHistoryItem,
     UploadResult,
 )
 from app.services.upload_parser import (
@@ -26,6 +28,7 @@ from app.services.upload_service import find_conflicts, resolve_rows, save_uploa
 router = APIRouter(prefix="/uploads", tags=["uploads"])
 
 MAX_UPLOAD_BYTES = 5 * 1024 * 1024
+HISTORY_LIMIT = 20
 
 
 def _error(status_code: int, message: str, errors: list[RowError] | None = None) -> JSONResponse:
@@ -44,6 +47,39 @@ def download_template() -> Response:
         media_type="text/csv",
         headers={"Content-Disposition": 'attachment; filename="service_usage_template.csv"'},
     )
+
+
+@router.get("", response_model=list[UploadHistoryItem])
+def list_uploads(db: Annotated[Session, Depends(get_db)]) -> list[UploadHistoryItem]:
+    """The most recent saved uploads, newest first."""
+    rows = db.execute(
+        select(
+            UploadBatch,
+            Office.name,
+            func.count(ServiceUsage.id),
+            func.min(ServiceUsage.week_start),
+            func.max(ServiceUsage.week_start),
+        )
+        .join(DataSource, UploadBatch.data_source_id == DataSource.id)
+        .join(Office, DataSource.office_id == Office.id)
+        .outerjoin(ServiceUsage, ServiceUsage.upload_batch_id == UploadBatch.id)
+        .group_by(UploadBatch.id, Office.name)
+        .order_by(UploadBatch.uploaded_at.desc(), UploadBatch.id.desc())
+        .limit(HISTORY_LIMIT)
+    ).all()
+    return [
+        UploadHistoryItem(
+            upload_batch_id=batch.id,
+            filename=batch.filename,
+            office=office,
+            uploaded_at=batch.uploaded_at,
+            row_count=batch.row_count,
+            weeks_kept=kept,
+            first_week=first,
+            last_week=last,
+        )
+        for batch, office, kept, first, last in rows
+    ]
 
 
 @router.post(

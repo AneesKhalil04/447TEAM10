@@ -8,16 +8,17 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import type { WeeklyTotal } from "./utils";
-import { formatFullDate, formatWeekLabel } from "./utils";
+import type { WeeklyTotal } from "../../types/dashboard";
+import { formatPeriodLabel, formatPeriodTick, type Period } from "./utils";
 
 interface TrendChartProps {
   data: WeeklyTotal[];
+  period: Period;
 }
 
-function TrendChart({ data }: TrendChartProps) {
+function TrendChart({ data, period }: TrendChartProps) {
   if (data.length === 0) {
-    return <p className="chart-empty">No weeks in this range.</p>;
+    return <p className="chart-empty">No data in this range.</p>;
   }
 
   return (
@@ -26,7 +27,7 @@ function TrendChart({ data }: TrendChartProps) {
         <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" vertical={false} />
         <XAxis
           dataKey="week_start"
-          tickFormatter={formatWeekLabel}
+          tickFormatter={(start) => formatPeriodTick(String(start), period)}
           stroke="var(--chart-axis)"
           tick={{ fill: "var(--chart-label)", fontSize: 12 }}
           minTickGap={24}
@@ -38,7 +39,7 @@ function TrendChart({ data }: TrendChartProps) {
           allowDecimals={false}
         />
         <Tooltip
-          labelFormatter={(label) => formatFullDate(String(label))}
+          labelFormatter={(label) => formatPeriodLabel(String(label), period)}
           contentStyle={{
             background: "var(--panel-bg)",
             border: "1px solid var(--border-line)",

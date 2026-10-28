@@ -1,7 +1,8 @@
-import type { DashboardFilters } from "./utils";
+import type { DashboardFilters } from "../../api/dashboard";
+import type { OfficeOption } from "../../types/dashboard";
 
 interface DashboardFiltersBarProps {
-  offices: string[];
+  offices: OfficeOption[];
   filters: DashboardFilters;
   minDate: string;
   maxDate: string;
@@ -16,13 +17,15 @@ function DashboardFiltersBar({ offices, filters, minDate, maxDate, onChange, onR
         <label htmlFor="office-filter">Office</label>
         <select
           id="office-filter"
-          value={filters.office ?? ""}
-          onChange={(event) => onChange({ ...filters, office: event.target.value || null })}
+          value={filters.officeId ?? ""}
+          onChange={(event) =>
+            onChange({ ...filters, officeId: event.target.value ? Number(event.target.value) : null })
+          }
         >
           <option value="">All offices</option>
           {offices.map((office) => (
-            <option key={office} value={office}>
-              {office}
+            <option key={office.id} value={office.id}>
+              {office.name}
             </option>
           ))}
         </select>

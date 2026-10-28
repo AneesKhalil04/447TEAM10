@@ -1,113 +1,169 @@
-import { useMemo, useState } from "react";
-import { sampleServiceUsage } from "../../data/sampleServiceUsage";
-import type { ServiceUsageRow } from "../../types/serviceUsage";
+import { useEffect, useState } from "react";
+import { fetchDashboardSummary, type DashboardFilters } from "../../api/dashboard";
+import type { DashboardSummary } from "../../types/dashboard";
 import DashboardFiltersBar from "./DashboardFiltersBar";
 import KpiCard from "./KpiCard";
 import OfficeBreakdownTable from "./OfficeBreakdownTable";
 import PoundsChart from "./PoundsChart";
 import TrendChart from "./TrendChart";
 import "./Dashboard.css";
-import {
-  filterRows,
-  formatFullDate,
-  listOffices,
-  officeTotals,
-  previousPeriodRows,
-  sum,
-  weeklyTotals,
-  type DashboardFilters,
-} from "./utils";
+import { formatFullDate, groupByMonth, type Period } from "./utils";
 
 interface DashboardProps {
-  rows?: ServiceUsageRow[];
+  fetchSummary?: (filters: DashboardFilters, signal?: AbortSignal) => Promise<DashboardSummary>;
+  onGoToUpload?: () => void;
 }
 
-const EMPTY_FILTERS: DashboardFilters = { office: null, start: null, end: null };
+const EMPTY_FILTERS: DashboardFilters = { officeId: null, start: null, end: null };
 
-function Dashboard({ rows = sampleServiceUsage }: DashboardProps) {
+function Dashboard({ fetchSummary = fetchDashboardSummary, onGoToUpload }: DashboardProps) {
   const [filters, setFilters] = useState<DashboardFilters>(EMPTY_FILTERS);
+  const [period, setPeriod] = useState<Period>("week");
+  const [summary, setSummary] = useState<DashboardSummary | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [attempt, setAttempt] = useState(0);
 
-  const offices = useMemo(() => listOffices(rows), [rows]);
-  const sortedWeeks = useMemo(() => Array.from(new Set(rows.map((row) => row.week_start))).sort(), [rows]);
-  const minDate = sortedWeeks[0] ?? "";
-  const maxDate = sortedWeeks[sortedWeeks.length - 1] ?? "";
+  useEffect(() => {
+    const controller = new AbortController();
+    setLoading(true);
+    setError(null);
+    fetchSummary(filters, controller.signal)
+      .then((data) => {
+        setSummary(data);
+        setLoading(false);
+      })
+      .catch((reason: unknown) => {
+        if (controller.signal.aborted) return;
+        setError(reason instanceof Error ? reason.message : "Something went wrong.");
+        setLoading(false);
+      });
+    // A newer filter change cancels the request still in flight.
+    return () => controller.abort();
+  }, [fetchSummary, filters, attempt]);
 
-  const filtered = useMemo(() => filterRows(rows, filters), [rows, filters]);
-  const trend = useMemo(() => weeklyTotals(filtered), [filtered]);
-  const breakdown = useMemo(() => officeTotals(rows), [rows]);
-  const previous = useMemo(() => previousPeriodRows(rows, filtered, filters.office), [rows, filtered, filters.office]);
-
-  const visits = sum(filtered, "visits");
-  const studentsServed = sum(filtered, "students_served");
-  const poundsDistributed = sum(filtered, "pounds_distributed");
-
-  const hasPrevious = previous.length > 0;
-  const previousVisits = hasPrevious ? sum(previous, "visits") : null;
-  const previousStudents = hasPrevious ? sum(previous, "students_served") : null;
-  const previousPounds = hasPrevious ? sum(previous, "pounds_distributed") : null;
-
-  const windowLabel =
-    filters.start || filters.end
-      ? `${filters.start ? formatFullDate(filters.start) : "start"} to ${filters.end ? formatFullDate(filters.end) : "now"}`
-      : "full sample period";
-  const officeLabel = filters.office ?? "all offices";
-  const takeaway = filtered.length
-    ? `${visits.toLocaleString()} visits served ${studentsServed.toLocaleString()} students and moved ${poundsDistributed.toLocaleString()} lb of food across ${officeLabel}, ${windowLabel}.`
-    : `No weeks match this filter for ${officeLabel}.`;
+  const retry = () => setAttempt((count) => count + 1);
+  const series = summary ? (period === "month" ? groupByMonth(summary.weeks) : summary.weeks) : [];
+  const per = period === "month" ? "month" : "week";
 
   return (
-    <main className="dash-page">
-      <header className="dash-header">
-        <p className="dash-eyebrow">Dean of Students &middot; Basic Needs Impact</p>
-        <h1>Retriever Essentials Impact Dashboard</h1>
-        <p className="dash-takeaway">{takeaway}</p>
-      </header>
-
-      <DashboardFiltersBar
-        offices={offices}
-        filters={filters}
-        minDate={minDate}
-        maxDate={maxDate}
-        onChange={setFilters}
-        onReset={() => setFilters(EMPTY_FILTERS)}
-      />
-
-      <div className="dash-kpis">
-        <KpiCard label="Visits" value={visits} previousValue={previousVisits} window={windowLabel} />
-        <KpiCard label="Students served" value={studentsServed} previousValue={previousStudents} />
-        <KpiCard label="Pounds distributed" value={poundsDistributed} previousValue={previousPounds} />
-      </div>
-
-      <div className="dash-grid">
-        <div className="dash-card">
-          <div className="card-title">Weekly visits &amp; students served</div>
-          <div className="card-note">One point per calendar week, for the office and date range selected above.</div>
-          <TrendChart data={trend} />
+    <>
+      {error && (
+        <div className="dash-alert" role="alert">
+          <span>{summary ? `Could not refresh the dashboard. ${error}` : error}</span>
+          <button type="button" className="reset-button" onClick={retry}>
+            Try again
+          </button>
         </div>
-        <div className="dash-card">
-          <div className="card-title">Pounds distributed per week</div>
-          <div className="card-note">Food pantry weight logged for the office and date range selected above.</div>
-          <PoundsChart data={trend} />
-        </div>
-      </div>
+      )}
 
-      <div className="dash-card">
-        <div className="card-title">Office breakdown &mdash; full sample period</div>
-        <div className="card-note">
-          Totals across the whole sample, independent of the filters above, to compare offices. Only Retriever
-          Essentials is part of the current pilot; Emergency Aid Program is shown to illustrate how a second office
-          looks once the data model is extended.
-        </div>
-        <OfficeBreakdownTable totals={breakdown} />
-      </div>
+      {!summary && loading && (
+        <p className="dash-status" role="status">
+          Loading dashboard&hellip;
+        </p>
+      )}
 
-      <footer className="dash-footnote">
-        Sample data for design review, generated to match the planned Service_Usage upload columns (office, week,
-        visits, students served, pounds distributed). It is not connected to a real office upload yet, and the
-        login and role-based access control screens are not part of this preview.
-      </footer>
-    </main>
+      {summary && !summary.data_range && (
+        <div className="dash-card dash-empty">
+          <div className="card-title">No data yet</div>
+          <p className="card-note">Upload a weekly or monthly file to see totals and charts here.</p>
+          {onGoToUpload && (
+            <button type="button" className="primary-button" onClick={onGoToUpload}>
+              Go to Upload data
+            </button>
+          )}
+        </div>
+      )}
+
+      {summary?.data_range && (
+        <div className="dash-body" aria-busy={loading}>
+          <p className="dash-takeaway">{takeaway(summary, filters)}</p>
+
+          <div className="dash-toolbar">
+            <DashboardFiltersBar
+              offices={summary.offices}
+              filters={filters}
+              minDate={summary.data_range.start}
+              maxDate={summary.data_range.end}
+              onChange={setFilters}
+              onReset={() => setFilters(EMPTY_FILTERS)}
+            />
+            <div className="period-toggle" role="group" aria-label="Show by">
+              {(["week", "month"] as const).map((option) => (
+                <button
+                  key={option}
+                  type="button"
+                  aria-pressed={period === option}
+                  onClick={() => setPeriod(option)}
+                >
+                  {option === "week" ? "Weekly" : "Monthly"}
+                </button>
+              ))}
+            </div>
+          </div>
+          {loading && (
+            <p className="dash-status" role="status">
+              Updating&hellip;
+            </p>
+          )}
+
+          <div className="dash-kpis">
+            <KpiCard
+              label="Visits"
+              value={summary.totals.visits}
+              previousValue={summary.previous_totals?.visits ?? null}
+              window={windowLabel(filters)}
+            />
+            <KpiCard
+              label="Students served"
+              value={summary.totals.students_served}
+              previousValue={summary.previous_totals?.students_served ?? null}
+            />
+            <KpiCard
+              label="Pounds distributed"
+              value={summary.totals.pounds_distributed}
+              previousValue={summary.previous_totals?.pounds_distributed ?? null}
+            />
+          </div>
+
+          <div className="dash-grid">
+            <div className="dash-card">
+              <div className="card-title">Visits &amp; students served per {per}</div>
+              <TrendChart data={series} period={period} />
+            </div>
+            <div className="dash-card">
+              <div className="card-title">Pounds of food distributed per {per}</div>
+              <PoundsChart data={series} period={period} />
+            </div>
+          </div>
+
+          {summary.offices.length > 1 && (
+            <div className="dash-card">
+              <div className="card-title">Totals by office &mdash; all uploaded data</div>
+              <OfficeBreakdownTable totals={summary.office_breakdown} />
+            </div>
+          )}
+
+          <p className="dash-footnote">
+            Aggregated totals only; no individual student records are shown. &ldquo;Students served&rdquo; adds up
+            each week&rsquo;s count, so a student who visits every week is counted each week.
+          </p>
+        </div>
+      )}
+    </>
   );
+}
+
+function windowLabel(filters: DashboardFilters): string {
+  if (!filters.start && !filters.end) return "all uploaded weeks";
+  return `${filters.start ? formatFullDate(filters.start) : "start"} to ${filters.end ? formatFullDate(filters.end) : "now"}`;
+}
+
+function takeaway(summary: DashboardSummary, filters: DashboardFilters): string {
+  const office = summary.offices.find((option) => option.id === filters.officeId)?.name ?? "all offices";
+  if (summary.weeks.length === 0) return `No weeks match this filter for ${office}.`;
+  const { visits, students_served, pounds_distributed } = summary.totals;
+  return `${visits.toLocaleString()} visits served ${students_served.toLocaleString()} students and moved ${pounds_distributed.toLocaleString()} lb of food across ${office}, ${windowLabel(filters)}.`;
 }
 
 export default Dashboard;

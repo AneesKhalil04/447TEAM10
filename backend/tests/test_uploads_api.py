@@ -184,3 +184,18 @@ def test_unreadable_and_oversized_files_are_rejected(
         files={"file": ("big.csv", b"x" * (5 * 1024 * 1024 + 1), "text/csv")},
     )
     assert too_big.status_code == 413
+
+
+def test_upload_history_lists_newest_first_with_weeks_still_in_use(
+    client: TestClient, source: DataSource
+) -> None:
+    assert client.get("/uploads").json() == []
+    upload(client, source, f"{HEADER}\n,2025-10-13,1,1,1\n,2025-10-20,1,1,1\n", name="a.csv")
+    upload(client, source, f"{HEADER}\n,2025-10-20,2,2,2\n", replace=True, name="b.csv")
+
+    history = client.get("/uploads").json()
+    assert [item["filename"] for item in history] == ["b.csv", "a.csv"]
+    older = history[1]
+    assert (older["row_count"], older["weeks_kept"]) == (2, 1)
+    assert (older["first_week"], older["last_week"]) == ("2025-10-13", "2025-10-13")
+    assert history[0]["office"] == "Retriever Essentials"
