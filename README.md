@@ -84,6 +84,8 @@ curl -F data_source_id=1 -F file=@backend/sample_data/upload_sample.csv localhos
 
 Interactive API docs are at http://localhost:8000/docs. `GET /uploads/template` returns the blank upload template.
 
+The local `docker-compose.yml` sets `ENABLE_TEST_TOOLS=true`, which adds a **Testing** tab to the frontend for resetting all uploaded data to the sample year or clearing it. It is off by default; never enable it in a shared or hosted deployment.
+
 After changing a model in `backend/app/models/`, generate a migration with `alembic revision --autogenerate -m "describe the change"`, review the generated file, and commit it with the model change. `pytest` fails if the models and migrations are out of sync.
 
 ## Running the Frontend Locally

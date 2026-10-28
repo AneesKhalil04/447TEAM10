@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routers import dashboard, data_sources, uploads
+from app.routers import dashboard, data_sources, testing, uploads
 
 app = FastAPI(title="Retriever Essentials Impact Dashboard API")
 
@@ -21,3 +21,4 @@ def health_check() -> dict[str, str]:
 app.include_router(dashboard.router)
 app.include_router(data_sources.router)
 app.include_router(uploads.router)
+app.include_router(testing.router)

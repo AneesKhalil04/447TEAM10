@@ -140,3 +140,41 @@
   color: var(--chart-label);
   font-size: 0.8rem;
 }
+
+.testing-warning {
+  border-left: 4px solid #c53030;
+}
+
+.testing-action {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.testing-action .card-note {
+  margin-bottom: 0;
+}
+
+.testing-confirm {
+  align-self: center;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #c53030;
+}
+
+.danger-button {
+  font: inherit;
+  font-weight: 600;
+  padding: 0.4rem 0.9rem;
+  border: 1px solid #c53030;
+  border-radius: 6px;
+  background: #c53030;
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.danger-button:disabled {
+  opacity: 0.5;
+}

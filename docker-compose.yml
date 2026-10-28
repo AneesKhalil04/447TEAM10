@@ -24,6 +24,8 @@ services:
         condition: service_healthy
     environment:
       DATABASE_URL: postgresql://postgres:postgres@db:5432/retriever_essentials
+      # Local demo only: enables the Testing tab that resets uploaded data.
+      ENABLE_TEST_TOOLS: "true"
     ports:
       - "8000:8000"
     volumes:

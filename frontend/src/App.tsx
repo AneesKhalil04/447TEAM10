@@ -1,22 +1,25 @@
 import { useEffect, useState } from "react";
+import { fetchTestToolsEnabled } from "./api/testing";
 import Dashboard from "./components/dashboard/Dashboard";
+import TestingPage from "./components/testing/TestingPage";
 import UploadPage from "./components/upload/UploadPage";
 import "./App.css";
 
-type Tab = "dashboard" | "upload";
+type Tab = "dashboard" | "upload" | "testing";
 
-const TABS: { id: Tab; label: string }[] = [
-  { id: "dashboard", label: "Dashboard" },
-  { id: "upload", label: "Upload data" },
-];
+interface AppProps {
+  loadTestToolsEnabled?: () => Promise<boolean>;
+}
 
 // The tab lives in the URL hash so a page refresh stays on the same tab.
 function tabFromHash(): Tab {
-  return window.location.hash === "#upload" ? "upload" : "dashboard";
+  const hash = window.location.hash.slice(1);
+  return hash === "upload" || hash === "testing" ? hash : "dashboard";
 }
 
-function App() {
+function App({ loadTestToolsEnabled = fetchTestToolsEnabled }: AppProps) {
   const [tab, setTab] = useState<Tab>(tabFromHash);
+  const [testTools, setTestTools] = useState(false);
 
   useEffect(() => {
     const onHashChange = () => setTab(tabFromHash());
@@ -24,8 +27,21 @@ function App() {
     return () => window.removeEventListener("hashchange", onHashChange);
   }, []);
 
+  useEffect(() => {
+    loadTestToolsEnabled()
+      .then(setTestTools)
+      .catch(() => setTestTools(false));
+  }, [loadTestToolsEnabled]);
+
+  const tabs: { id: Tab; label: string }[] = [
+    { id: "dashboard", label: "Dashboard" },
+    { id: "upload", label: "Upload data" },
+    ...(testTools ? [{ id: "testing" as const, label: "Testing" }] : []),
+  ];
+  const current = tab === "testing" && !testTools ? "dashboard" : tab;
+
   const open = (next: Tab) => {
-    window.location.hash = next === "upload" ? "upload" : "";
+    window.location.hash = next === "dashboard" ? "" : next;
     setTab(next);
   };
 
@@ -37,13 +53,13 @@ function App() {
       </header>
 
       <nav className="app-tabs" role="tablist" aria-label="Sections">
-        {TABS.map(({ id, label }) => (
+        {tabs.map(({ id, label }) => (
           <button
             key={id}
             type="button"
             role="tab"
             id={`tab-${id}`}
-            aria-selected={tab === id}
+            aria-selected={current === id}
             aria-controls={`panel-${id}`}
             onClick={() => open(id)}
           >
@@ -52,12 +68,10 @@ function App() {
         ))}
       </nav>
 
-      <div role="tabpanel" id={`panel-${tab}`} aria-labelledby={`tab-${tab}`} className="app-panel">
-        {tab === "dashboard" ? (
-          <Dashboard onGoToUpload={() => open("upload")} />
-        ) : (
-          <UploadPage onViewDashboard={() => open("dashboard")} />
-        )}
+      <div role="tabpanel" id={`panel-${current}`} aria-labelledby={`tab-${current}`} className="app-panel">
+        {current === "dashboard" && <Dashboard onGoToUpload={() => open("upload")} />}
+        {current === "upload" && <UploadPage onViewDashboard={() => open("dashboard")} />}
+        {current === "testing" && <TestingPage />}
       </div>
     </main>
   );
