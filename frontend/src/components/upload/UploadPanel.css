@@ -88,3 +88,55 @@
   gap: 0.75rem;
 }
 
+
+.upload-change {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: #fff8e1;
+  border: 1px solid var(--umbc-gold);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.upload-change-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.upload-change-row .upload-change {
+  flex: 1 1 24rem;
+}
+
+.upload-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.upload-steps ol {
+  margin: 0.5rem 0 0;
+  padding-left: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.upload-steps a {
+  color: inherit;
+}
+
+.table-scroll {
+  overflow-x: auto;
+}
+
+.muted {
+  color: var(--chart-label);
+  font-size: 0.8rem;
+}

@@ -1,6 +1,6 @@
 from datetime import date, datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class RowErrorOut(BaseModel):
@@ -37,3 +37,14 @@ class UploadResult(BaseModel):
     first_week: date
     last_week: date
     uploaded_at: datetime
+
+
+class UploadHistoryItem(BaseModel):
+    upload_batch_id: int
+    filename: str
+    office: str
+    uploaded_at: datetime
+    row_count: int = Field(description="Rows in the file when it was uploaded")
+    weeks_kept: int = Field(description="Rows still in use; later uploads may have replaced some")
+    first_week: date | None
+    last_week: date | None

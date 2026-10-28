@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import { TEMPLATE_URL, fetchDataSources, uploadFile } from "../../api/uploads";
+import { fetchDataSources, uploadFile } from "../../api/uploads";
 import type { DataSource, UploadOutcome } from "../../types/upload";
 import { formatFullDate } from "../dashboard/utils";
 import "./UploadPanel.css";
@@ -60,12 +60,9 @@ function UploadPanel({ onUploaded, loadDataSources = fetchDataSources, sendFile 
   return (
     <section className="dash-card upload-panel" aria-labelledby="upload-title">
       <div className="card-title" id="upload-title">
-        Upload weekly data
+        Upload a file
       </div>
-      <div className="card-note">
-        A .csv or .xlsx file in the <a href={TEMPLATE_URL}>upload template</a> format. If any row has a problem,
-        nothing is saved.
-      </div>
+      <div className="card-note">CSV or Excel (.xlsx), up to 5 MB. If any row has a problem, nothing is saved.</div>
 
       <form className="upload-form" onSubmit={submit}>
         {sources.length > 1 && (
@@ -115,8 +112,7 @@ function UploadPanel({ onUploaded, loadDataSources = fetchDataSources, sendFile 
           Saved {outcome.result.row_count} week{outcome.result.row_count === 1 ? "" : "s"} from{" "}
           <strong>{outcome.result.filename}</strong> ({formatFullDate(outcome.result.first_week)} to{" "}
           {formatFullDate(outcome.result.last_week)})
-          {outcome.result.replaced_rows > 0 && `, replacing ${outcome.result.replaced_rows} earlier week(s)`}. The
-          dashboard has been updated.
+          {outcome.result.replaced_rows > 0 && `, replacing ${outcome.result.replaced_rows} earlier week(s)`}.
         </div>
       )}
 

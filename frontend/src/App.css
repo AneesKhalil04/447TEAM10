@@ -1,0 +1,39 @@
+.app-tabs {
+  display: flex;
+  gap: 0.25rem;
+  border-bottom: 1px solid var(--border-line);
+  margin-top: -1rem;
+}
+
+.app-tabs button {
+  font: inherit;
+  font-weight: 600;
+  padding: 0.6rem 1.1rem;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -1px;
+  background: transparent;
+  color: var(--chart-label);
+  cursor: pointer;
+}
+
+.app-tabs button[aria-selected="true"] {
+  color: var(--umbc-black);
+  border-bottom-color: var(--umbc-gold);
+}
+
+.app-tabs button:hover {
+  color: var(--umbc-black);
+}
+
+.app-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* The tab strip underlines the header instead. */
+.dash-page > .dash-header {
+  border-bottom: 0;
+  padding-bottom: 0;
+}

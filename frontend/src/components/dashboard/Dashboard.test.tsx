@@ -1,5 +1,5 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import type { DashboardFilters } from "../../api/dashboard";
 import type { DashboardSummary } from "../../types/dashboard";
 import Dashboard from "./Dashboard";
@@ -34,10 +34,6 @@ function kpiValues(container: HTMLElement): string[] {
 }
 
 describe("Dashboard", () => {
-  afterEach(() => {
-    vi.unstubAllGlobals();
-  });
-
   it("shows a loading message, then the totals from the API", async () => {
     const fetchSummary = vi.fn().mockResolvedValue(summary());
     const { container } = render(<Dashboard fetchSummary={fetchSummary} />);
@@ -89,9 +85,12 @@ describe("Dashboard", () => {
       weeks: [],
       office_breakdown: [],
     });
-    render(<Dashboard fetchSummary={vi.fn().mockResolvedValue(empty)} />);
-    expect(await screen.findByText(/No data has been uploaded yet\. Upload a weekly file/)).toBeInTheDocument();
+    const onGoToUpload = vi.fn();
+    render(<Dashboard fetchSummary={vi.fn().mockResolvedValue(empty)} onGoToUpload={onGoToUpload} />);
+    expect(await screen.findByText("No data yet")).toBeInTheDocument();
     expect(screen.queryByRole("table")).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Go to Upload data" }));
+    expect(onGoToUpload).toHaveBeenCalled();
   });
 
   it("shows the error and recovers when the user retries", async () => {
@@ -107,45 +106,13 @@ describe("Dashboard", () => {
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
   });
 
-  it("says how the totals changed after an upload", async () => {
-    const source = { id: 1, name: "Weekly service usage", office_id: 2, office: "Retriever Essentials" };
-    vi.stubGlobal(
-      "fetch",
-      vi.fn<typeof fetch>((input) =>
-        Promise.resolve(
-          String(input).endsWith("/data-sources")
-            ? new Response(JSON.stringify([source]), { status: 200 })
-            : new Response(
-                JSON.stringify({
-                  upload_batch_id: 2,
-                  filename: "week.csv",
-                  data_source_id: 1,
-                  office: "Retriever Essentials",
-                  row_count: 1,
-                  replaced_rows: 0,
-                  first_week: "2026-01-19",
-                  last_week: "2026-01-19",
-                  uploaded_at: "2026-01-20T10:00:00Z",
-                }),
-                { status: 201 },
-              ),
-        ),
-      ),
-    );
-    const fetchSummary = vi
-      .fn()
-      .mockResolvedValueOnce(summary())
-      .mockResolvedValue(summary({ totals: { visits: 345, students_served: 170, pounds_distributed: 2700 } }));
-    const { container } = render(<Dashboard fetchSummary={fetchSummary} />);
+  it("switches the charts between weekly and monthly", async () => {
+    render(<Dashboard fetchSummary={vi.fn().mockResolvedValue(summary())} />);
+    expect(await screen.findByText("Visits & students served per week")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Weekly" })).toHaveAttribute("aria-pressed", "true");
 
-    fireEvent.click(await screen.findByRole("button", { name: "Upload data" }));
-    await screen.findByText(/Uploading to/);
-    fireEvent.change(screen.getByLabelText("File"), { target: { files: [new File(["x"], "week.csv")] } });
-    fireEvent.click(screen.getByRole("button", { name: "Upload" }));
-
-    expect(await screen.findByText(/Dashboard updated from your upload/)).toHaveTextContent(
-      "Visits 245 → 345 (+100) · Pounds distributed 2,200 → 2,700 (+500)",
-    );
-    expect(kpiValues(container)).toEqual(["345", "170", "2,700"]);
+    fireEvent.click(screen.getByRole("button", { name: "Monthly" }));
+    expect(screen.getByText("Pounds of food distributed per month")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Monthly" })).toHaveAttribute("aria-pressed", "true");
   });
 });

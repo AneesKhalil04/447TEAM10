@@ -1,30 +1,28 @@
 import { useEffect, useState } from "react";
 import { fetchDashboardSummary, type DashboardFilters } from "../../api/dashboard";
-import type { DashboardSummary, Totals } from "../../types/dashboard";
+import type { DashboardSummary } from "../../types/dashboard";
 import DashboardFiltersBar from "./DashboardFiltersBar";
 import KpiCard from "./KpiCard";
 import OfficeBreakdownTable from "./OfficeBreakdownTable";
 import PoundsChart from "./PoundsChart";
 import TrendChart from "./TrendChart";
-import UploadChangeNote from "./UploadChangeNote";
-import UploadPanel from "../upload/UploadPanel";
 import "./Dashboard.css";
-import { formatFullDate } from "./utils";
+import { formatFullDate, groupByMonth, type Period } from "./utils";
 
 interface DashboardProps {
   fetchSummary?: (filters: DashboardFilters, signal?: AbortSignal) => Promise<DashboardSummary>;
+  onGoToUpload?: () => void;
 }
 
 const EMPTY_FILTERS: DashboardFilters = { officeId: null, start: null, end: null };
 
-function Dashboard({ fetchSummary = fetchDashboardSummary }: DashboardProps) {
+function Dashboard({ fetchSummary = fetchDashboardSummary, onGoToUpload }: DashboardProps) {
   const [filters, setFilters] = useState<DashboardFilters>(EMPTY_FILTERS);
+  const [period, setPeriod] = useState<Period>("week");
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [attempt, setAttempt] = useState(0);
-  const [showUpload, setShowUpload] = useState(false);
-  const [totalsBeforeUpload, setTotalsBeforeUpload] = useState<Totals | null>(null);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -45,47 +43,11 @@ function Dashboard({ fetchSummary = fetchDashboardSummary }: DashboardProps) {
   }, [fetchSummary, filters, attempt]);
 
   const retry = () => setAttempt((count) => count + 1);
-  const changeFilters = (next: DashboardFilters) => {
-    setTotalsBeforeUpload(null);
-    setFilters(next);
-  };
-  const handleUploaded = () => {
-    // Remember what was on screen so the refreshed totals can be compared against it.
-    setTotalsBeforeUpload(summary?.totals ?? null);
-    setLoading(true);
-    retry();
-  };
-  // With nothing uploaded yet, the upload form is the only useful thing on the page.
-  const uploadOpen = showUpload || summary?.data_range === null;
+  const series = summary ? (period === "month" ? groupByMonth(summary.weeks) : summary.weeks) : [];
+  const per = period === "month" ? "month" : "week";
 
   return (
-    <main className="dash-page">
-      <header className="dash-header">
-        <p className="dash-eyebrow">Dean of Students &middot; Basic Needs Impact</p>
-        <div className="dash-header-row">
-          <h1>Retriever Essentials Impact Dashboard</h1>
-          <button
-            type="button"
-            className="primary-button"
-            aria-expanded={uploadOpen}
-            onClick={() => setShowUpload((open) => !open)}
-          >
-            {uploadOpen ? "Close upload" : "Upload data"}
-          </button>
-        </div>
-        {summary && <p className="dash-takeaway">{takeaway(summary, filters)}</p>}
-      </header>
-
-      {uploadOpen && <UploadPanel onUploaded={handleUploaded} />}
-
-      {summary && !loading && totalsBeforeUpload && (
-        <UploadChangeNote
-          before={totalsBeforeUpload}
-          after={summary.totals}
-          onDismiss={() => setTotalsBeforeUpload(null)}
-        />
-      )}
-
+    <>
       {error && (
         <div className="dash-alert" role="alert">
           <span>{summary ? `Could not refresh the dashboard. ${error}` : error}</span>
@@ -101,16 +63,44 @@ function Dashboard({ fetchSummary = fetchDashboardSummary }: DashboardProps) {
         </p>
       )}
 
-      {summary && (
+      {summary && !summary.data_range && (
+        <div className="dash-card dash-empty">
+          <div className="card-title">No data yet</div>
+          <p className="card-note">Upload a weekly or monthly file to see totals and charts here.</p>
+          {onGoToUpload && (
+            <button type="button" className="primary-button" onClick={onGoToUpload}>
+              Go to Upload data
+            </button>
+          )}
+        </div>
+      )}
+
+      {summary?.data_range && (
         <div className="dash-body" aria-busy={loading}>
-          <DashboardFiltersBar
-            offices={summary.offices}
-            filters={filters}
-            minDate={summary.data_range?.start ?? ""}
-            maxDate={summary.data_range?.end ?? ""}
-            onChange={changeFilters}
-            onReset={() => changeFilters(EMPTY_FILTERS)}
-          />
+          <p className="dash-takeaway">{takeaway(summary, filters)}</p>
+
+          <div className="dash-toolbar">
+            <DashboardFiltersBar
+              offices={summary.offices}
+              filters={filters}
+              minDate={summary.data_range.start}
+              maxDate={summary.data_range.end}
+              onChange={setFilters}
+              onReset={() => setFilters(EMPTY_FILTERS)}
+            />
+            <div className="period-toggle" role="group" aria-label="Show by">
+              {(["week", "month"] as const).map((option) => (
+                <button
+                  key={option}
+                  type="button"
+                  aria-pressed={period === option}
+                  onClick={() => setPeriod(option)}
+                >
+                  {option === "week" ? "Weekly" : "Monthly"}
+                </button>
+              ))}
+            </div>
+          </div>
           {loading && (
             <p className="dash-status" role="status">
               Updating&hellip;
@@ -138,36 +128,29 @@ function Dashboard({ fetchSummary = fetchDashboardSummary }: DashboardProps) {
 
           <div className="dash-grid">
             <div className="dash-card">
-              <div className="card-title">Weekly visits &amp; students served</div>
-              <div className="card-note">One point per calendar week, for the office and date range selected above.</div>
-              <TrendChart data={summary.weeks} />
+              <div className="card-title">Visits &amp; students served per {per}</div>
+              <TrendChart data={series} period={period} />
             </div>
             <div className="dash-card">
-              <div className="card-title">Pounds distributed per week</div>
-              <div className="card-note">Food pantry weight logged for the office and date range selected above.</div>
-              <PoundsChart data={summary.weeks} />
+              <div className="card-title">Pounds of food distributed per {per}</div>
+              <PoundsChart data={series} period={period} />
             </div>
           </div>
 
-          <div className="dash-card">
-            <div className="card-title">Office breakdown &mdash; all uploaded data</div>
-            <div className="card-note">
-              Totals across every upload, independent of the filters above, to compare offices.
-            </div>
-            {summary.office_breakdown.length > 0 ? (
+          {summary.offices.length > 1 && (
+            <div className="dash-card">
+              <div className="card-title">Totals by office &mdash; all uploaded data</div>
               <OfficeBreakdownTable totals={summary.office_breakdown} />
-            ) : (
-              <p className="chart-empty">No data has been uploaded yet.</p>
-            )}
-          </div>
+            </div>
+          )}
+
+          <p className="dash-footnote">
+            Aggregated totals only; no individual student records are shown. &ldquo;Students served&rdquo; adds up
+            each week&rsquo;s count, so a student who visits every week is counted each week.
+          </p>
         </div>
       )}
-
-      <footer className="dash-footnote">
-        Figures are aggregated totals from uploaded weekly files; no individual student records are shown. Login and
-        role-based access control are not part of this preview yet.
-      </footer>
-    </main>
+    </>
   );
 }
 
@@ -177,7 +160,6 @@ function windowLabel(filters: DashboardFilters): string {
 }
 
 function takeaway(summary: DashboardSummary, filters: DashboardFilters): string {
-  if (!summary.data_range) return "No data has been uploaded yet. Upload a weekly file to see totals here.";
   const office = summary.offices.find((option) => option.id === filters.officeId)?.name ?? "all offices";
   if (summary.weeks.length === 0) return `No weeks match this filter for ${office}.`;
   const { visits, students_served, pounds_distributed } = summary.totals;

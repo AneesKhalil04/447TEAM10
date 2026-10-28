@@ -1,14 +1,15 @@
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import type { WeeklyTotal } from "../../types/dashboard";
-import { formatFullDate, formatWeekLabel } from "./utils";
+import { formatPeriodLabel, formatPeriodTick, type Period } from "./utils";
 
 interface PoundsChartProps {
   data: WeeklyTotal[];
+  period: Period;
 }
 
-function PoundsChart({ data }: PoundsChartProps) {
+function PoundsChart({ data, period }: PoundsChartProps) {
   if (data.length === 0) {
-    return <p className="chart-empty">No weeks in this range.</p>;
+    return <p className="chart-empty">No data in this range.</p>;
   }
 
   return (
@@ -17,7 +18,7 @@ function PoundsChart({ data }: PoundsChartProps) {
         <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" vertical={false} />
         <XAxis
           dataKey="week_start"
-          tickFormatter={formatWeekLabel}
+          tickFormatter={(start) => formatPeriodTick(String(start), period)}
           stroke="var(--chart-axis)"
           tick={{ fill: "var(--chart-label)", fontSize: 12 }}
           minTickGap={24}
@@ -29,7 +30,7 @@ function PoundsChart({ data }: PoundsChartProps) {
           allowDecimals={false}
         />
         <Tooltip
-          labelFormatter={(label) => formatFullDate(String(label))}
+          labelFormatter={(label) => formatPeriodLabel(String(label), period)}
           formatter={(value) => [`${Number(value).toLocaleString()} lb`, "Pounds distributed"]}
           contentStyle={{
             background: "var(--panel-bg)",

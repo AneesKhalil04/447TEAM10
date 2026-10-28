@@ -37,3 +37,14 @@ export type UploadOutcome =
   | { kind: "saved"; result: UploadResult }
   | { kind: "invalid"; message: string; errors: RowError[] }
   | { kind: "conflict"; message: string; conflicts: UploadConflict[] };
+
+export interface UploadHistoryItem {
+  upload_batch_id: number;
+  filename: string;
+  office: string;
+  uploaded_at: string;
+  row_count: number;
+  weeks_kept: number;
+  first_week: string | null;
+  last_week: string | null;
+}

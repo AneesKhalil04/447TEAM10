@@ -1,10 +1,14 @@
-import type { DataSource, UploadOutcome } from "../types/upload";
+import type { DataSource, UploadHistoryItem, UploadOutcome } from "../types/upload";
 import { API_URL, getJson } from "./client";
 
 export const TEMPLATE_URL = `${API_URL}/uploads/template`;
 
 export function fetchDataSources(signal?: AbortSignal): Promise<DataSource[]> {
   return getJson<DataSource[]>("/data-sources", signal);
+}
+
+export function fetchUploadHistory(signal?: AbortSignal): Promise<UploadHistoryItem[]> {
+  return getJson<UploadHistoryItem[]>("/uploads", signal);
 }
 
 /**

@@ -22,12 +22,11 @@ function UploadChangeNote({ before, after, onDismiss }: UploadChangeNoteProps) {
     <div className="upload-change" role="status">
       {changed.length === 0 ? (
         <span>
-          Dashboard refreshed. The totals did not change: the upload held the same numbers as the weeks it
-          replaced, or its weeks are outside the dates selected below.
+          The dashboard totals did not change: this file held the same numbers as the weeks it replaced.
         </span>
       ) : (
         <span>
-          Dashboard updated from your upload:{" "}
+          Dashboard totals updated:{" "}
           {changed
             .map(([key, label]) => {
               const diff = after[key] - before[key];

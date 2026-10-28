@@ -249,24 +249,43 @@
   }
 }
 
-.dash-header-row {
+
+.dash-toolbar {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
+  align-items: end;
   justify-content: space-between;
-  gap: 0.75rem;
+  gap: 1rem;
 }
 
-.upload-change {
+.period-toggle {
+  display: inline-flex;
+  border: 1px solid var(--border-line);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.period-toggle button {
+  font: inherit;
+  padding: 0.4rem 0.9rem;
+  border: 0;
+  background: var(--panel-bg);
+  color: inherit;
+  cursor: pointer;
+}
+
+.period-toggle button + button {
+  border-left: 1px solid var(--border-line);
+}
+
+.period-toggle button[aria-pressed="true"] {
+  background: var(--umbc-gold);
+  font-weight: 600;
+}
+
+.dash-empty {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  padding: 0.75rem 1rem;
-  background: #fff8e1;
-  border: 1px solid var(--umbc-gold);
-  border-radius: 8px;
-  font-size: 0.9rem;
-  font-variant-numeric: tabular-nums;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
 }
