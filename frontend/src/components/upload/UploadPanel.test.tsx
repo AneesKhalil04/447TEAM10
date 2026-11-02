@@ -41,7 +41,9 @@ describe("UploadPanel", () => {
     });
     const onUploaded = await renderPanel(sendFile);
 
-    expect(await screen.findByText(/Saved 3 weeks from/)).toBeInTheDocument();
+    expect(await screen.findByText(/Saved 3 weeks from/)).toHaveTextContent(
+      "Saved 3 weeks from week.csv (Oct 12, 2026 to Oct 26, 2026).",
+    );
     expect(sendFile).toHaveBeenCalledWith(csv, 1, false);
     expect(onUploaded).toHaveBeenCalledTimes(1);
   });

@@ -10,6 +10,12 @@ export function formatFullDate(weekStart: string): string {
   return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" });
 }
 
+/** "Oct 12, 2026" for one week, "Oct 12, 2026 to Oct 26, 2026" for several. */
+export function formatWeekRange(firstWeek: string, lastWeek: string): string {
+  if (firstWeek === lastWeek) return formatFullDate(firstWeek);
+  return `${formatFullDate(firstWeek)} to ${formatFullDate(lastWeek)}`;
+}
+
 export type Period = "week" | "month";
 
 /** Roll weekly totals up into calendar months, keyed by the first day of the month a week starts in. */

@@ -1,5 +1,5 @@
 import type { UploadHistoryItem } from "../../types/upload";
-import { formatFullDate } from "../dashboard/utils";
+import { formatWeekRange } from "../dashboard/utils";
 
 interface UploadHistoryProps {
   items: UploadHistoryItem[];
@@ -11,8 +11,7 @@ function formatUploadedAt(timestamp: string): string {
 
 function weeksCovered(item: UploadHistoryItem): string {
   if (!item.first_week || !item.last_week) return "All weeks replaced by later uploads";
-  if (item.first_week === item.last_week) return formatFullDate(item.first_week);
-  return `${formatFullDate(item.first_week)} to ${formatFullDate(item.last_week)}`;
+  return formatWeekRange(item.first_week, item.last_week);
 }
 
 function UploadHistory({ items }: UploadHistoryProps) {
@@ -45,7 +44,7 @@ function UploadHistory({ items }: UploadHistoryProps) {
                   <span className="muted"> of {item.row_count} (rest replaced)</span>
                 )}
               </td>
-              <td>{formatUploadedAt(item.uploaded_at)}</td>
+              <td className="nowrap">{formatUploadedAt(item.uploaded_at)}</td>
               <td>{item.uploaded_by ?? <span className="muted">Unknown</span>}</td>
             </tr>
           ))}

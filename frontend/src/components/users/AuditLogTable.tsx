@@ -1,5 +1,5 @@
 import type { AuditEntry } from "../../types/auth";
-import { formatFullDate } from "../dashboard/utils";
+import { formatWeekRange } from "../dashboard/utils";
 
 interface AuditLogTableProps {
   entries: AuditEntry[];
@@ -9,8 +9,7 @@ function weeks({ details }: AuditEntry): string {
   const { rows = 0, first_week, last_week } = details;
   const count = `${rows} week${rows === 1 ? "" : "s"}`;
   if (!first_week || !last_week) return count;
-  if (first_week === last_week) return `${count} (${formatFullDate(first_week)})`;
-  return `${count} (${formatFullDate(first_week)} to ${formatFullDate(last_week)})`;
+  return `${count} (${formatWeekRange(first_week, last_week)})`;
 }
 
 function AuditLogTable({ entries }: AuditLogTableProps) {
@@ -33,7 +32,7 @@ function AuditLogTable({ entries }: AuditLogTableProps) {
         <tbody>
           {entries.map((entry) => (
             <tr key={entry.id}>
-              <td>
+              <td className="nowrap">
                 {new Date(entry.created_at).toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" })}
               </td>
               <td>{entry.username}</td>
