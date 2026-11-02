@@ -7,6 +7,8 @@ from sqlalchemy.orm import Session
 
 from app.models import DataSource, Office, Service, ServiceUsage, UploadBatch
 
+pytestmark = pytest.mark.usefixtures("signed_in_admin")
+
 
 @pytest.fixture
 def offices(db: Session) -> dict[str, Office]:

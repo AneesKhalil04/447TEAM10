@@ -48,3 +48,4 @@ class UploadHistoryItem(BaseModel):
     weeks_kept: int = Field(description="Rows still in use; later uploads may have replaced some")
     first_week: date | None
     last_week: date | None
+    uploaded_by: str | None = Field(description="Username, if the account still exists")

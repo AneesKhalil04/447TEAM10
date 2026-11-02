@@ -8,6 +8,8 @@ from app.main import app
 from app.models import ServiceUsage, UploadBatch
 from app.seed import seed
 
+pytestmark = pytest.mark.usefixtures("signed_in_admin")
+
 HEADER = "office,week_start,visits,students_served,pounds_distributed"
 
 
@@ -59,3 +61,9 @@ def test_reset_can_reload_the_sample_year(client: TestClient, db: Session, tools
     assert response.json()["loaded_rows"] == 52
     assert count(db, ServiceUsage) == 52
     assert count(db, UploadBatch) == 1
+
+
+def test_the_sample_upload_is_credited_to_the_admin(client: TestClient, tools_enabled) -> None:
+    assert client.post("/testing/reset", json={"load_sample": True}).status_code == 200
+    assert client.get("/uploads").json()[0]["uploaded_by"] == "admin"
+    assert client.get("/audit-log").json()[0]["filename"] == "upload_sample.csv"

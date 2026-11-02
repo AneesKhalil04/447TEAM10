@@ -10,6 +10,8 @@ from sqlalchemy.pool import StaticPool
 from app import models  # noqa: F401  (registers every table on Base.metadata)
 from app.db import Base, get_db
 from app.main import app
+from app.models import Role
+from app.services.user_service import create_user
 
 
 def _enable_sqlite_foreign_keys(dbapi_connection, _record) -> None:
@@ -50,3 +52,26 @@ def client(session_factory: sessionmaker[Session]) -> Iterator[TestClient]:
     with TestClient(app) as test_client:
         yield test_client
     app.dependency_overrides.clear()
+
+
+TEST_PASSWORD = "correct-horse"
+
+
+def make_user(db: Session, username: str, role: str, office_id: int | None = None):
+    """Create an account with TEST_PASSWORD."""
+    return create_user(db, username, TEST_PASSWORD, Role(role), office_id)
+
+
+def sign_in(client: TestClient, username: str, password: str = TEST_PASSWORD):
+    """Log in; the TestClient keeps the session cookie for later requests."""
+    response = client.post("/auth/login", json={"username": username, "password": password})
+    assert response.status_code == 200, response.text
+    return response
+
+
+@pytest.fixture
+def signed_in_admin(client: TestClient, db: Session):
+    """For tests about other features: every request is made as a signed-in admin."""
+    admin = make_user(db, "admin", "admin")
+    sign_in(client, "admin")
+    return admin

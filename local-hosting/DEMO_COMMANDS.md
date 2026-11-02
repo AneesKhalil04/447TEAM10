@@ -2,7 +2,7 @@
 
 Every command, in order. These are written for **Windows PowerShell**. Where Git Bash or macOS differs, the alternative is shown underneath.
 
-The one-shot scripts (`start_demo.ps1` / `start_demo.sh`) run steps 3 to 8 for you.
+The one-shot scripts (`start_demo.ps1` / `start_demo.sh`) run steps 3 to 9 for you.
 
 ## 1. Start Docker Desktop
 
@@ -18,8 +18,7 @@ A version number means Docker is ready. An error means it is still starting; wai
 
 ```powershell
 cd C:\path\to\447TEAM10
-git fetch
-git switch Anees-feature/local-hosting
+git switch main
 git pull
 ```
 
@@ -49,21 +48,43 @@ Expected: `{"status":"ok"}`. If you get "connection refused", the backend is sti
 
 (Git Bash / macOS: `curl http://localhost:8000/health`)
 
-## 6. Load the sample data
+## 6. Create the demo accounts
 
-This deletes everything uploaded and loads the 52 sample weeks (Oct 13, 2025 to Oct 5, 2026). It also creates the Retriever Essentials office if it does not exist yet.
+Everything except `/health` needs a signed-in user. This creates the Retriever Essentials office and one account per role. Running it again restores their passwords and reactivates them.
 
 ```powershell
-Invoke-RestMethod -Method Post -Uri http://localhost:8000/testing/reset -ContentType "application/json" -Body '{"load_sample": true}'
+docker compose exec -T backend python -m app.demo_users
+```
+
+| Username | Password | Role | Sees |
+|---|---|---|---|
+| `admin` | `demo-admin-pass` | Admin | Dashboard, Upload data, Users, Testing |
+| `staff` | `demo-staff-pass` | Staff (Retriever Essentials) | Dashboard, Upload data |
+| `dean` | `demo-dean-pass` | Leadership | Dashboard only |
+
+These only work because the local `docker-compose.yml` turns on `ENABLE_TEST_TOOLS`.
+
+## 7. Load the sample data
+
+This deletes everything uploaded and loads the 52 sample weeks (Oct 13, 2025 to Oct 5, 2026). Resetting is admin-only, so sign in as `admin` first.
+
+```powershell
+Invoke-RestMethod -Method Post -Uri http://localhost:8000/auth/login -SessionVariable admin -ContentType "application/json" -Body '{"username": "admin", "password": "demo-admin-pass"}'
+Invoke-RestMethod -Method Post -Uri http://localhost:8000/testing/reset -WebSession $admin -ContentType "application/json" -Body '{"load_sample": true}'
 ```
 
 Expected: `loaded_rows : 52`.
 
-(Git Bash / macOS: `curl -X POST http://localhost:8000/testing/reset -H "Content-Type: application/json" -d '{"load_sample": true}'`)
+Git Bash / macOS:
 
-You can also do this later from the website: **Testing** tab, then **Reset to sample data**.
+```bash
+curl -c cookies.txt -H "Content-Type: application/json" -d '{"username": "admin", "password": "demo-admin-pass"}' http://localhost:8000/auth/login
+curl -b cookies.txt -X POST http://localhost:8000/testing/reset -H "Content-Type: application/json" -d '{"load_sample": true}'
+```
 
-## 7. Start the website
+You can also do this later from the website: sign in as `admin`, open the **Testing** tab, then **Reset to sample data**.
+
+## 8. Start the website
 
 ```powershell
 cd frontend
@@ -73,13 +94,13 @@ npm run dev
 
 `npm install` is only needed the first time or after the dependencies change. Leave this window open; the website stops when it closes.
 
-## 8. Open the dashboard
+## 9. Open the dashboard and sign in
 
-Go to **http://localhost:5173** in the browser.
+Go to **http://localhost:5173** in the browser and sign in with one of the demo accounts from step 6.
 
 Use `localhost`, not `127.0.0.1`; the backend only accepts requests from `http://localhost:5173`.
 
-## 9. Optional: look inside the database
+## 10. Optional: look inside the database
 
 In a second terminal, from the repo folder:
 
@@ -115,5 +136,7 @@ Or use DBeaver with host `localhost`, port `5432`, database `retriever_essential
 | `Port 5173 is in use` | The website is already running in another window. Use that one, or close it first. |
 | Dashboard says it cannot reach the API | Run steps 4 and 5. Check `docker compose logs backend` for errors. |
 | Blank white page | Stop the website with Ctrl+C, run `npm run dev` again and refresh the browser with Ctrl+F5. |
-| No Testing tab | The backend was started without `ENABLE_TEST_TOOLS`. Use the repo's `docker-compose.yml` and run step 3 again. |
+| No Testing tab | Sign in as `admin`; other roles never see it. If the admin still does not, the backend was started without `ENABLE_TEST_TOOLS`: use the repo's `docker-compose.yml` and run step 3 again. |
+| "Incorrect username or password" for a demo account | Run step 6 again; it restores the demo passwords. |
+| Sent back to the sign-in page with "Your session ended" | Sessions last 8 hours, and resetting an account's password signs it out. Sign in again. |
 | `running scripts is disabled on this system` | Start the script with `powershell -ExecutionPolicy Bypass -File local-hosting\start_demo.ps1`. |

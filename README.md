@@ -75,22 +75,34 @@ alembic upgrade head
 uvicorn app.main:app --reload
 ```
 
-To load the pilot office and try an upload:
+Every page and endpoint except `/health` needs a signed-in user. Create the pilot office and the first admin, then sign in and try an upload:
 
 ```
 docker compose exec backend python -m app.seed
-curl -F data_source_id=1 -F file=@backend/sample_data/upload_sample.csv localhost:8000/uploads
+docker compose exec backend python -m app.create_user admin --role admin
+curl -c cookies.txt -H "Content-Type: application/json" -d '{"username":"admin","password":"<password>"}' localhost:8000/auth/login
+curl -b cookies.txt -F data_source_id=1 -F file=@backend/sample_data/upload_sample.csv localhost:8000/uploads
 ```
+
+After that, the admin adds everyone else from the **Users** tab. Roles:
+
+| Role | Can do |
+|---|---|
+| admin | Everything: upload for any office, manage accounts, see the upload audit log, use the Testing tab |
+| staff | View the dashboard and upload for their own office |
+| leadership | View the dashboard only |
+
+Sessions last 8 hours and are kept in an httpOnly cookie. Passwords are hashed with argon2. Before hosting anywhere, set `SECRET_KEY` to a long random value and `COOKIE_SECURE=true` (and `COOKIE_SAMESITE=none` if the frontend is on a different domain).
 
 Interactive API docs are at http://localhost:8000/docs. `GET /uploads/template` returns the blank upload template.
 
-The local `docker-compose.yml` sets `ENABLE_TEST_TOOLS=true`, which adds a **Testing** tab to the frontend for resetting all uploaded data to the sample year or clearing it. It is off by default; never enable it in a shared or hosted deployment.
+The local `docker-compose.yml` sets `ENABLE_TEST_TOOLS=true`, which adds a **Testing** tab (admins only) for resetting all uploaded data to the sample year or clearing it, and allows `python -m app.demo_users` to create one demo account per role with known passwords. It is off by default; never enable it in a shared or hosted deployment.
 
 After changing a model in `backend/app/models/`, generate a migration with `alembic revision --autogenerate -m "describe the change"`, review the generated file, and commit it with the model change. `pytest` fails if the models and migrations are out of sync.
 
 ## Running the Frontend Locally
 
-The dashboard reads its numbers from the API, so start the backend first (see above) and load some data with the seed and upload commands.
+The dashboard reads its numbers from the API, so start the backend first (see above) and create an account to sign in with.
 
 ```
 cd frontend

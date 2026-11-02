@@ -8,6 +8,8 @@ from sqlalchemy.orm import Session
 from app.models import DataSource, Service, ServiceUsage, UploadBatch
 from app.seed import seed
 
+pytestmark = pytest.mark.usefixtures("signed_in_admin")
+
 SAMPLE_FILE = Path(__file__).resolve().parent.parent / "sample_data" / "upload_sample.csv"
 HEADER = "office,week_start,visits,students_served,pounds_distributed"
 

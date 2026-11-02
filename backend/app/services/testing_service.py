@@ -6,7 +6,7 @@ from pathlib import Path
 from sqlalchemy import delete, func, select
 from sqlalchemy.orm import Session
 
-from app.models import ServiceUsage, UploadBatch
+from app.models import ServiceUsage, StaffUser, UploadBatch
 from app.seed import seed
 from app.services.upload_parser import read_rows, validate_rows
 from app.services.upload_service import resolve_rows, save_upload
@@ -21,8 +21,11 @@ class ResetResult:
     loaded_rows: int
 
 
-def reset_data(db: Session, load_sample: bool) -> ResetResult:
-    """Delete every upload and its rows, then optionally load the sample file as a fresh upload."""
+def reset_data(db: Session, load_sample: bool, admin: StaffUser | None = None) -> ResetResult:
+    """Delete every upload and its rows, then optionally load the sample file as a fresh upload.
+
+    The sample upload is recorded as made by the admin who asked for the reset.
+    """
     deleted_rows = db.scalar(select(func.count()).select_from(ServiceUsage)) or 0
     deleted_uploads = db.scalar(select(func.count()).select_from(UploadBatch)) or 0
     db.execute(delete(ServiceUsage))
@@ -36,6 +39,8 @@ def reset_data(db: Session, load_sample: bool) -> ResetResult:
         resolved, resolve_errors = resolve_rows(db, source, parsed)
         if errors or resolve_errors:
             raise ValueError(f"{SAMPLE_FILE.name} does not pass validation.")
-        loaded_rows = save_upload(db, source, SAMPLE_FILE.name, resolved, []).batch.row_count
+        loaded_rows = save_upload(
+            db, source, SAMPLE_FILE.name, resolved, [], uploaded_by=admin
+        ).batch.row_count
 
     return ResetResult(deleted_uploads, deleted_rows, loaded_rows)

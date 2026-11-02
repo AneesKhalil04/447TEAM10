@@ -8,3 +8,8 @@ body {
   font-family: system-ui, sans-serif;
   color: var(--umbc-black);
 }
+
+/* Dates and times stay on one line; the table scrolls sideways on narrow screens instead. */
+.nowrap {
+  white-space: nowrap;
+}

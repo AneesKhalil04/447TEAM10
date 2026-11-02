@@ -6,8 +6,9 @@ from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
+from app.auth import CurrentUser, Uploader
 from app.db import get_db
-from app.models import DataSource, Office, ServiceUsage, UploadBatch
+from app.models import DataSource, Office, Role, ServiceUsage, StaffUser, UploadBatch
 from app.schemas.upload import (
     ConflictOut,
     RowErrorOut,
@@ -40,7 +41,7 @@ def _error(status_code: int, message: str, errors: list[RowError] | None = None)
 
 
 @router.get("/template", response_class=Response)
-def download_template() -> Response:
+def download_template(_user: CurrentUser) -> Response:
     """A CSV with just the header row, for offices to fill in."""
     return Response(
         content=",".join(TEMPLATE_COLUMNS) + "\r\n",
@@ -50,7 +51,9 @@ def download_template() -> Response:
 
 
 @router.get("", response_model=list[UploadHistoryItem])
-def list_uploads(db: Annotated[Session, Depends(get_db)]) -> list[UploadHistoryItem]:
+def list_uploads(
+    db: Annotated[Session, Depends(get_db)], _user: CurrentUser
+) -> list[UploadHistoryItem]:
     """The most recent saved uploads, newest first."""
     rows = db.execute(
         select(
@@ -59,11 +62,13 @@ def list_uploads(db: Annotated[Session, Depends(get_db)]) -> list[UploadHistoryI
             func.count(ServiceUsage.id),
             func.min(ServiceUsage.week_start),
             func.max(ServiceUsage.week_start),
+            StaffUser.username,
         )
         .join(DataSource, UploadBatch.data_source_id == DataSource.id)
         .join(Office, DataSource.office_id == Office.id)
         .outerjoin(ServiceUsage, ServiceUsage.upload_batch_id == UploadBatch.id)
-        .group_by(UploadBatch.id, Office.name)
+        .outerjoin(StaffUser, UploadBatch.uploaded_by_id == StaffUser.id)
+        .group_by(UploadBatch.id, Office.name, StaffUser.username)
         .order_by(UploadBatch.uploaded_at.desc(), UploadBatch.id.desc())
         .limit(HISTORY_LIMIT)
     ).all()
@@ -77,8 +82,9 @@ def list_uploads(db: Annotated[Session, Depends(get_db)]) -> list[UploadHistoryI
             weeks_kept=kept,
             first_week=first,
             last_week=last,
+            uploaded_by=uploaded_by,
         )
-        for batch, office, kept, first, last in rows
+        for batch, office, kept, first, last, uploaded_by in rows
     ]
 
 
@@ -88,6 +94,7 @@ def list_uploads(db: Annotated[Session, Depends(get_db)]) -> list[UploadHistoryI
     response_model=UploadResult,
     responses={
         400: {"model": UploadErrorResponse, "description": "The file cannot be read"},
+        403: {"model": UploadErrorResponse, "description": "Not allowed to upload for this office"},
         404: {"model": UploadErrorResponse, "description": "Unknown data source"},
         409: {
             "model": UploadConflictResponse,
@@ -101,12 +108,15 @@ async def create_upload(
     file: Annotated[UploadFile, File(description="A .csv or .xlsx file following the template")],
     data_source_id: Annotated[int, Form()],
     db: Annotated[Session, Depends(get_db)],
+    user: Uploader,
     replace: Annotated[bool, Form(description="Replace weeks that were already uploaded")] = False,
 ):
-    """Validate a file and save all of its rows, or none of them."""
+    """Validate a file and save all of its rows, or none of them. Staff upload for their office."""
     data_source = db.get(DataSource, data_source_id)
     if data_source is None:
         return _error(status.HTTP_404_NOT_FOUND, f"Data source {data_source_id} does not exist.")
+    if user.role == Role.STAFF and data_source.office_id != user.office_id:
+        return _error(status.HTTP_403_FORBIDDEN, "You can only upload data for your own office.")
 
     content = await file.read(MAX_UPLOAD_BYTES + 1)
     if len(content) > MAX_UPLOAD_BYTES:
@@ -151,7 +161,7 @@ async def create_upload(
         )
 
     try:
-        result = save_upload(db, data_source, filename, resolved, conflicts)
+        result = save_upload(db, data_source, filename, resolved, conflicts, uploaded_by=user)
     except IntegrityError:
         # Another upload for the same weeks committed between our check and our save.
         return _error(

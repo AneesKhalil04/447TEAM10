@@ -35,4 +35,14 @@ or from Git Bash:
 bash local-hosting/start_demo.sh
 ```
 
-Both scripts start the containers, wait for the API, reset the data to the 52 sample weeks, start the website and open it in the browser. Press Ctrl+C in that window to stop the website; the containers keep running until `docker compose down`.
+Both scripts start the containers, wait for the API, create the demo accounts, reset the data to the 52 sample weeks, start the website and open it in the browser.
+
+## Demo accounts
+
+| Username | Password | Role | Sees |
+|---|---|---|---|
+| `admin` | `demo-admin-pass` | Admin | Dashboard, Upload data, Users, Testing |
+| `staff` | `demo-staff-pass` | Staff (Retriever Essentials) | Dashboard, Upload data |
+| `dean` | `demo-dean-pass` | Leadership | Dashboard only |
+
+They exist only on a local machine with `ENABLE_TEST_TOOLS` on. Press Ctrl+C in that window to stop the website; the containers keep running until `docker compose down`.

@@ -1,5 +1,5 @@
 import type { DataSource, UploadHistoryItem, UploadOutcome } from "../types/upload";
-import { API_URL, getJson } from "./client";
+import { API_URL, apiFetch, getJson } from "./client";
 
 export const TEMPLATE_URL = `${API_URL}/uploads/template`;
 
@@ -21,12 +21,7 @@ export async function uploadFile(file: File, dataSourceId: number, replace = fal
   form.append("data_source_id", String(dataSourceId));
   form.append("replace", String(replace));
 
-  let response: Response;
-  try {
-    response = await fetch(`${API_URL}/uploads`, { method: "POST", body: form });
-  } catch {
-    throw new Error("Could not reach the server. Check that the API is running.");
-  }
+  const response = await apiFetch("/uploads", { method: "POST", body: form });
   const body = await response.json().catch(() => null);
 
   if (response.status === 201) return { kind: "saved", result: body };

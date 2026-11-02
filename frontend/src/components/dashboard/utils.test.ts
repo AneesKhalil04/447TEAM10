@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatPeriodLabel, formatPeriodTick, groupByMonth } from "./utils";
+import { formatPeriodLabel, formatPeriodTick, formatWeekRange, groupByMonth } from "./utils";
 
 describe("groupByMonth", () => {
   it("adds up each month's weeks, by the month each week starts in", () => {
@@ -20,5 +20,12 @@ describe("period labels", () => {
     expect(formatPeriodLabel("2026-10-12", "week")).toBe("Week of Oct 12, 2026");
     expect(formatPeriodLabel("2026-10-01", "month")).toBe("October 2026");
     expect(formatPeriodTick("2026-10-01", "month")).toBe("Oct 2026");
+  });
+});
+
+describe("formatWeekRange", () => {
+  it("names a single week once and joins a span with 'to'", () => {
+    expect(formatWeekRange("2026-10-12", "2026-10-12")).toBe("Oct 12, 2026");
+    expect(formatWeekRange("2026-10-12", "2026-10-26")).toBe("Oct 12, 2026 to Oct 26, 2026");
   });
 });

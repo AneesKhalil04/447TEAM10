@@ -31,10 +31,9 @@ Notes:
 ```powershell
 git clone https://github.com/AneesKhalil04/447TEAM10.git
 cd 447TEAM10
-git switch Anees-feature/local-hosting
 ```
 
-If the repo is already cloned: `git fetch` then `git switch Anees-feature/local-hosting` and `git pull`.
+If the repo is already cloned: `git switch main` then `git pull`.
 
 ## Download everything ahead of time
 
@@ -64,7 +63,7 @@ No output means all three are free. (macOS: `lsof -i :5432 -i :8000 -i :5173`)
 powershell -ExecutionPolicy Bypass -File local-hosting\start_demo.ps1
 ```
 
-The browser should open http://localhost:5173 showing the dashboard with **8,325 visits, 5,469 students served and 109,811 lb** distributed, and three tabs: Dashboard, Upload data and Testing. Then stop everything with `Ctrl+C` and `docker compose down`.
+The browser should open http://localhost:5173 on the sign-in page. Sign in as `admin` / `demo-admin-pass`: the dashboard shows **8,325 visits, 5,469 students served and 109,811 lb** distributed, with four tabs: Dashboard, Upload data, Users and Testing. Then stop everything with `Ctrl+C` and `docker compose down`.
 
 ## Summary checklist
 
@@ -72,7 +71,7 @@ The browser should open http://localhost:5173 showing the dashboard with **8,325
 - [ ] `wsl --status` shows WSL 2 (Windows)
 - [ ] `docker compose version` works and Docker Desktop shows "Engine running"
 - [ ] `node -v` is 20 or newer
-- [ ] Repo cloned and on `Anees-feature/local-hosting`
+- [ ] Repo cloned and on `main`
 - [ ] `docker compose build` and `npm install` finished
 - [ ] Ports 5432, 8000, 5173 free
-- [ ] Start script opens the dashboard with 8,325 visits
+- [ ] Start script opens the sign-in page, and `admin` / `demo-admin-pass` shows 8,325 visits

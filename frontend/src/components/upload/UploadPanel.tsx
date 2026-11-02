@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { fetchDataSources, uploadFile } from "../../api/uploads";
 import type { DataSource, UploadOutcome } from "../../types/upload";
-import { formatFullDate } from "../dashboard/utils";
+import { formatFullDate, formatWeekRange } from "../dashboard/utils";
 import "./UploadPanel.css";
 
 interface UploadPanelProps {
@@ -110,8 +110,8 @@ function UploadPanel({ onUploaded, loadDataSources = fetchDataSources, sendFile 
       {outcome?.kind === "saved" && (
         <div className="upload-result upload-success" role="status">
           Saved {outcome.result.row_count} week{outcome.result.row_count === 1 ? "" : "s"} from{" "}
-          <strong>{outcome.result.filename}</strong> ({formatFullDate(outcome.result.first_week)} to{" "}
-          {formatFullDate(outcome.result.last_week)})
+          <strong>{outcome.result.filename}</strong> (
+          {formatWeekRange(outcome.result.first_week, outcome.result.last_week)})
           {outcome.result.replaced_rows > 0 && `, replacing ${outcome.result.replaced_rows} earlier week(s)`}.
         </div>
       )}
