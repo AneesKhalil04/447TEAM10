@@ -1,0 +1,78 @@
+.users-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.users-message {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  background: #f1f8f3;
+  border: 1px solid #a9d5b5;
+  font-size: 0.9rem;
+}
+
+.add-user-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 1rem;
+}
+
+.add-user-form .field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.add-user-form label {
+  font-size: 0.75rem;
+  color: var(--chart-label);
+}
+
+.add-user-form input,
+.add-user-form select,
+.users-table select,
+.users-table input {
+  font: inherit;
+  padding: 0.4rem 0.6rem;
+  border: 1px solid var(--border-line);
+  border-radius: 6px;
+  background: var(--panel-bg);
+  color: inherit;
+}
+
+.users-table td {
+  vertical-align: middle;
+}
+
+.row-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.row-actions button {
+  padding: 0.3rem 0.7rem;
+  font-size: 0.85rem;
+}
+
+.row-actions input {
+  width: 11rem;
+}
+
+.row-error {
+  margin-top: 0.35rem;
+  font-size: 0.8rem;
+  color: #b3261e;
+}
+
+.inactive-row td {
+  color: var(--chart-label);
+}

@@ -74,7 +74,7 @@ describe("App", () => {
 
   it("hides the Testing tab when test tools are off", async () => {
     renderApp(makeUser("admin"), false);
-    expect(await tabNames()).toEqual(["Dashboard", "Upload data"]);
+    expect(await tabNames()).toEqual(["Dashboard", "Upload data", "Users"]);
   });
 
   it("falls back to the dashboard when the hash names a tab the role cannot use", async () => {

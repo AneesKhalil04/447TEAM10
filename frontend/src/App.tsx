@@ -6,10 +6,11 @@ import LoginPage from "./components/auth/LoginPage";
 import Dashboard from "./components/dashboard/Dashboard";
 import TestingPage from "./components/testing/TestingPage";
 import UploadPage from "./components/upload/UploadPage";
+import UsersPage from "./components/users/UsersPage";
 import { ROLE_LABELS, type User } from "./types/auth";
 import "./App.css";
 
-type Tab = "dashboard" | "upload" | "testing";
+type Tab = "dashboard" | "upload" | "users" | "testing";
 
 interface AppProps {
   loadCurrentUser?: () => Promise<User | null>;
@@ -20,7 +21,7 @@ interface AppProps {
 // The tab lives in the URL hash so a page refresh stays on the same tab.
 function tabFromHash(): Tab {
   const hash = window.location.hash.slice(1);
-  return hash === "upload" || hash === "testing" ? hash : "dashboard";
+  return hash === "upload" || hash === "users" || hash === "testing" ? hash : "dashboard";
 }
 
 function App({
@@ -127,6 +128,7 @@ function App({
   const tabs: { id: Tab; label: string }[] = [
     { id: "dashboard", label: "Dashboard" },
     ...(canUpload ? [{ id: "upload" as const, label: "Upload data" }] : []),
+    ...(isAdmin ? [{ id: "users" as const, label: "Users" }] : []),
     ...(testTools ? [{ id: "testing" as const, label: "Testing" }] : []),
   ];
   const current = tabs.some(({ id }) => id === tab) ? tab : "dashboard";
@@ -154,6 +156,7 @@ function App({
       <div role="tabpanel" id={`panel-${current}`} aria-labelledby={`tab-${current}`} className="app-panel">
         {current === "dashboard" && <Dashboard onGoToUpload={canUpload ? () => open("upload") : undefined} />}
         {current === "upload" && <UploadPage onViewDashboard={() => open("dashboard")} />}
+        {current === "users" && <UsersPage currentUserId={user.id} />}
         {current === "testing" && <TestingPage />}
       </div>
     </main>
