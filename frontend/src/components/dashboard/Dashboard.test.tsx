@@ -16,7 +16,8 @@ const breakdown = [
 function summary(overrides: Partial<DashboardSummary> = {}): DashboardSummary {
   return {
     offices,
-    data_range: { start: "2026-01-05", end: "2026-01-12" },
+    // Uploads go back further than the two weeks returned, so preset ranges are not clamped.
+    data_range: { start: "2025-06-02", end: "2026-01-12" },
     totals: { visits: 245, students_served: 170, pounds_distributed: 2200 },
     weeks: [
       { week_start: "2026-01-05", visits: 110, students_served: 78, pounds_distributed: 1000 },
@@ -28,6 +29,9 @@ function summary(overrides: Partial<DashboardSummary> = {}): DashboardSummary {
     ...overrides,
   };
 }
+
+// The latest week in summary() is 2026-01-12, so the default 12 weeks start 11 weeks earlier.
+const LAST_12_WEEKS = { start: "2025-10-27", end: "2026-01-12" };
 
 function kpiValues(container: HTMLElement): string[] {
   return Array.from(container.querySelectorAll(".kpi-value")).map((el) => el.textContent ?? "");
@@ -43,6 +47,65 @@ describe("Dashboard", () => {
     expect(fetchSummary).toHaveBeenCalledWith({ officeId: null, start: null, end: null }, expect.any(AbortSignal));
   });
 
+  it("opens on the last 12 uploaded weeks", async () => {
+    const fetchSummary = vi.fn().mockResolvedValue(summary());
+    render(<Dashboard fetchSummary={fetchSummary} />);
+
+    expect(
+      await screen.findByText(/^In the last 12 weeks \(Oct 27, 2025 to Jan 12, 2026; only 2 of those weeks have data/),
+    ).toBeInTheDocument();
+    expect(fetchSummary).toHaveBeenLastCalledWith({ officeId: null, ...LAST_12_WEEKS }, expect.any(AbortSignal));
+    expect(screen.getByRole("button", { name: "Last 12 weeks" })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByLabelText("From")).toHaveValue("2025-10-27");
+    expect(screen.getByText("last 12 weeks")).toBeInTheDocument();
+  });
+
+  it("starts the range at the first uploaded week and says when fewer weeks have data", async () => {
+    const fetchSummary = vi.fn().mockResolvedValue(summary({ data_range: { start: "2026-01-05", end: "2026-01-12" } }));
+    render(<Dashboard fetchSummary={fetchSummary} />);
+
+    expect(
+      await screen.findByText(
+        /^In the last 12 weeks \(Jan 5, 2026 to Jan 12, 2026; only 2 of those weeks have data so far\)/,
+      ),
+    ).toBeInTheDocument();
+    expect(fetchSummary).toHaveBeenLastCalledWith(
+      { officeId: null, start: "2026-01-05", end: "2026-01-12" },
+      expect.any(AbortSignal),
+    );
+  });
+
+  it("switches between the range buttons, custom dates and back", async () => {
+    const fetchSummary = vi.fn().mockResolvedValue(summary());
+    render(<Dashboard fetchSummary={fetchSummary} />);
+    await screen.findByText(/^In the last 12 weeks/);
+
+    fireEvent.click(screen.getByRole("button", { name: "Last 4 weeks" }));
+    await waitFor(() =>
+      expect(fetchSummary).toHaveBeenLastCalledWith(
+        { officeId: null, start: "2025-12-22", end: "2026-01-12" },
+        expect.any(AbortSignal),
+      ),
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "All time" }));
+    await waitFor(() =>
+      expect(fetchSummary).toHaveBeenLastCalledWith({ officeId: null, start: null, end: null }, expect.any(AbortSignal)),
+    );
+    expect(await screen.findByText(/all uploaded weeks\.$/)).toBeInTheDocument();
+
+    fireEvent.change(screen.getByLabelText("From"), { target: { value: "2026-01-05" } });
+    for (const name of ["Last 4 weeks", "Last 12 weeks", "All time"]) {
+      expect(screen.getByRole("button", { name })).toHaveAttribute("aria-pressed", "false");
+    }
+
+    fireEvent.click(screen.getByRole("button", { name: "Reset filters" }));
+    expect(screen.getByRole("button", { name: "Last 12 weeks" })).toHaveAttribute("aria-pressed", "true");
+    await waitFor(() =>
+      expect(fetchSummary).toHaveBeenLastCalledWith({ officeId: null, ...LAST_12_WEEKS }, expect.any(AbortSignal)),
+    );
+  });
+
   it("asks the API again when the office filter changes", async () => {
     const fetchSummary = vi.fn((filters: DashboardFilters) =>
       Promise.resolve(
@@ -56,11 +119,12 @@ describe("Dashboard", () => {
 
     fireEvent.change(screen.getByLabelText("Office"), { target: { value: "1" } });
     await waitFor(() => expect(kpiValues(container)).toEqual(["25", "20", "0"]));
-    expect(fetchSummary).toHaveBeenLastCalledWith({ officeId: 1, start: null, end: null }, expect.any(AbortSignal));
+    // Changing the office keeps the date range.
+    expect(fetchSummary).toHaveBeenLastCalledWith({ officeId: 1, ...LAST_12_WEEKS }, expect.any(AbortSignal));
     expect(screen.getByText(/across Emergency Aid Program/)).toBeInTheDocument();
   });
 
-  it("shows the prior-period comparison when the API returns one", async () => {
+  it("compares against the previous 12 weeks when the API returns them", async () => {
     const fetchSummary = vi.fn().mockResolvedValue(
       summary({
         previous_period: { start: "2025-12-22", end: "2025-12-29" },
@@ -68,7 +132,7 @@ describe("Dashboard", () => {
       }),
     );
     render(<Dashboard fetchSummary={fetchSummary} />);
-    expect(await screen.findByText("+45 (+23%) vs prior period")).toBeInTheDocument();
+    expect(await screen.findByText("+45 (+23%) vs previous 12 weeks")).toBeInTheDocument();
   });
 
   it("lists every office in the breakdown table", async () => {
