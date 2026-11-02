@@ -78,7 +78,7 @@ describe("UploadPage", () => {
     fireEvent.change(screen.getByLabelText("File"), { target: { files: [new File(["x"], "october.csv")] } });
     fireEvent.click(screen.getByRole("button", { name: "Upload" }));
 
-    expect(await screen.findByText(/Dashboard totals updated/)).toHaveTextContent(
+    expect(await screen.findByText(/All-time totals updated/)).toHaveTextContent(
       "Visits 8,325 → 9,114 (+789) · Students served 5,469 → 5,981 (+512)",
     );
     expect(await screen.findByRole("cell", { name: "october.csv" })).toBeInTheDocument();

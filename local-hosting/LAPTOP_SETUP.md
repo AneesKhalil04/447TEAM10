@@ -63,7 +63,7 @@ No output means all three are free. (macOS: `lsof -i :5432 -i :8000 -i :5173`)
 powershell -ExecutionPolicy Bypass -File local-hosting\start_demo.ps1
 ```
 
-The browser should open http://localhost:5173 on the sign-in page. Sign in as `admin` / `demo-admin-pass`: the dashboard shows **8,325 visits, 5,469 students served and 109,811 lb** distributed, with four tabs: Dashboard, Upload data, Users and Testing. Then stop everything with `Ctrl+C` and `docker compose down`.
+The browser should open http://localhost:5173 on the sign-in page. Sign in as `admin` / `demo-admin-pass`: the dashboard opens on the last 12 weeks (Jul 20 to Oct 5, 2026) with **2,184 visits, 1,436 students served and 27,948 lb** distributed, and four tabs: Dashboard, Upload data, Users and Testing. Clicking **All time** shows 8,325 visits. Then stop everything with `Ctrl+C` and `docker compose down`.
 
 ## Summary checklist
 
@@ -74,4 +74,4 @@ The browser should open http://localhost:5173 on the sign-in page. Sign in as `a
 - [ ] Repo cloned and on `main`
 - [ ] `docker compose build` and `npm install` finished
 - [ ] Ports 5432, 8000, 5173 free
-- [ ] Start script opens the sign-in page, and `admin` / `demo-admin-pass` shows 8,325 visits
+- [ ] Start script opens the sign-in page, and `admin` / `demo-admin-pass` shows 2,184 visits for the last 12 weeks (8,325 under All time)

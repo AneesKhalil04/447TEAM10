@@ -14,7 +14,7 @@ const LABELS: [keyof Totals, string][] = [
 
 const numberFormatter = new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 });
 
-/** Spells out how the totals on screen moved after an upload, since a few new weeks are easy to miss. */
+/** Spells out how the all-time totals moved after an upload, since a few new weeks are easy to miss. */
 function UploadChangeNote({ before, after, onDismiss }: UploadChangeNoteProps) {
   const changed = LABELS.filter(([key]) => before[key] !== after[key]);
 
@@ -22,11 +22,11 @@ function UploadChangeNote({ before, after, onDismiss }: UploadChangeNoteProps) {
     <div className="upload-change" role="status">
       {changed.length === 0 ? (
         <span>
-          The dashboard totals did not change: this file held the same numbers as the weeks it replaced.
+          The all-time totals did not change: this file held the same numbers as the weeks it replaced.
         </span>
       ) : (
         <span>
-          Dashboard totals updated:{" "}
+          All-time totals updated:{" "}
           {changed
             .map(([key, label]) => {
               const diff = after[key] - before[key];
