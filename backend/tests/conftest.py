@@ -67,3 +67,11 @@ def sign_in(client: TestClient, username: str, password: str = TEST_PASSWORD):
     response = client.post("/auth/login", json={"username": username, "password": password})
     assert response.status_code == 200, response.text
     return response
+
+
+@pytest.fixture
+def signed_in_admin(client: TestClient, db: Session):
+    """For tests about other features: every request is made as a signed-in admin."""
+    admin = make_user(db, "admin", "admin")
+    sign_in(client, "admin")
+    return admin

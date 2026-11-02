@@ -4,6 +4,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
+from app.auth import CurrentUser
 from app.db import get_db
 from app.models import Office
 from app.schemas.dashboard import DashboardSummary
@@ -15,6 +16,7 @@ router = APIRouter(prefix="/dashboard", tags=["dashboard"])
 @router.get("/summary", response_model=DashboardSummary)
 def dashboard_summary(
     db: Annotated[Session, Depends(get_db)],
+    _user: CurrentUser,
     office_id: Annotated[int | None, Query(description="Limit to one office")] = None,
     start: Annotated[date | None, Query(description="First week to include (YYYY-MM-DD)")] = None,
     end: Annotated[date | None, Query(description="Last week to include (YYYY-MM-DD)")] = None,

@@ -8,6 +8,8 @@ from app.main import app
 from app.models import ServiceUsage, UploadBatch
 from app.seed import seed
 
+pytestmark = pytest.mark.usefixtures("signed_in_admin")
+
 HEADER = "office,week_start,visits,students_served,pounds_distributed"
 
 

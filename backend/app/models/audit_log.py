@@ -2,13 +2,16 @@ from __future__ import annotations
 
 import enum
 from datetime import datetime
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from sqlalchemy import DateTime, Enum, ForeignKey, String, func
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db import Base
 from app.models._types import JSONType
+
+if TYPE_CHECKING:
+    from app.models.upload_batch import UploadBatch
 
 
 class AuditAction(enum.StrEnum):
@@ -41,3 +44,5 @@ class AuditLog(Base):
     office: Mapped[str] = mapped_column(String(120))
     filename: Mapped[str] = mapped_column(String(255))
     details: Mapped[dict[str, Any]] = mapped_column(JSONType, default=dict)
+
+    upload_batch: Mapped[UploadBatch | None] = relationship()

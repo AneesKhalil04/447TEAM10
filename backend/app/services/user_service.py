@@ -52,3 +52,36 @@ def create_user(
     db.add(user)
     db.commit()
     return user
+
+
+def update_user(
+    db: Session,
+    user: StaffUser,
+    acting_admin: StaffUser,
+    *,
+    role: Role | None = None,
+    office_id: int | None = None,
+    is_active: bool | None = None,
+    password: str | None = None,
+) -> StaffUser:
+    """Apply an admin's changes. Admins cannot lock themselves out by demoting or deactivating."""
+    if user.id == acting_admin.id and (
+        (role is not None and role != Role.ADMIN) or is_active is False
+    ):
+        raise UserError("You cannot remove your own admin access. Ask another admin.")
+
+    # Validate everything before changing anything.
+    if password is not None:
+        check_password(password)
+    new_role = role or user.role
+    if role is not None or office_id is not None:
+        new_office_id = check_office(db, new_role, office_id or user.office_id)
+        user.role, user.office_id = new_role, new_office_id
+    if password is not None:
+        user.password_hash = hash_password(password)
+        user.session_version += 1  # signs out sessions that used the old password
+    if is_active is not None and is_active != user.is_active:
+        user.is_active = is_active
+        user.session_version += 1
+    db.commit()
+    return user

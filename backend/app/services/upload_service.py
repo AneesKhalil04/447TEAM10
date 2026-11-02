@@ -10,7 +10,16 @@ from datetime import date, datetime
 from sqlalchemy import delete, select
 from sqlalchemy.orm import Session
 
-from app.models import DataSource, Service, ServiceUsage, UploadBatch, UploadStatus
+from app.models import (
+    AuditAction,
+    AuditLog,
+    DataSource,
+    Service,
+    ServiceUsage,
+    StaffUser,
+    UploadBatch,
+    UploadStatus,
+)
 from app.services.upload_parser import ParsedRow, RowError
 
 
@@ -109,8 +118,12 @@ def save_upload(
     filename: str,
     rows: list[ResolvedRow],
     replace: list[Conflict],
+    uploaded_by: StaffUser | None = None,
 ) -> SaveResult:
-    """Replace any conflicting rows and store the new batch in a single transaction."""
+    """Replace any conflicting rows and store the new batch in a single transaction.
+
+    When uploaded_by is given, the audit log entry is written in the same transaction.
+    """
     replace_ids = [usage_id for conflict in replace for usage_id in conflict.usage_ids]
     try:
         if replace_ids:
@@ -122,6 +135,7 @@ def save_upload(
             filename=filename,
             status=UploadStatus.SUCCEEDED,
             row_count=len(rows),
+            uploaded_by=uploaded_by,
         )
         batch.usage_rows = [
             ServiceUsage(
@@ -136,8 +150,38 @@ def save_upload(
             for row in rows
         ]
         db.add(batch)
+        if uploaded_by is not None:
+            db.add(_audit_entry(uploaded_by, batch, data_source, rows, replace, len(replace_ids)))
         db.commit()
     except Exception:
         db.rollback()
         raise
     return SaveResult(batch=batch, replaced_rows=len(replace_ids))
+
+
+def _audit_entry(
+    user: StaffUser,
+    batch: UploadBatch,
+    data_source: DataSource,
+    rows: list[ResolvedRow],
+    replace: list[Conflict],
+    replaced_rows: int,
+) -> AuditLog:
+    weeks = [row.parsed.week_start for row in rows]
+    details = {
+        "rows": len(rows),
+        "first_week": min(weeks).isoformat() if weeks else None,
+        "last_week": max(weeks).isoformat() if weeks else None,
+    }
+    if replaced_rows:
+        details["replaced_rows"] = replaced_rows
+        details["replaced_files"] = sorted({conflict.filename for conflict in replace})
+    return AuditLog(
+        user_id=user.id,
+        username=user.username,
+        action=AuditAction.REPLACE if replaced_rows else AuditAction.UPLOAD,
+        upload_batch=batch,
+        office=data_source.office.name,
+        filename=batch.filename,
+        details=details,
+    )
