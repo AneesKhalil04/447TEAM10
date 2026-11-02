@@ -15,7 +15,7 @@ Three-tier layered web app: **React SPA (presentation), FastAPI REST API (busine
 | Database | PostgreSQL | Relational fit for the model (Office, Service, Service_Usage, Staff_User, Role, Upload_Batch, Data_Source, and others), with constraints and foreign keys |
 | API | REST with JSON, documented through FastAPI's OpenAPI/Swagger. MVP refreshes after each batch upload. Stretch: WebSockets or SSE for live updates. | Real-time pulling from all offices is unrealistic this semester |
 | Data ingestion | Weekly or monthly batch CSV/Excel upload with a standard template and validation (openpyxl and Python's csv module) | Replaces manual spreadsheet tracking. Pantrysoft can export CSV/Excel. |
-| Auth and security | Password hashing (argon2 or bcrypt), JWT or session cookies, RBAC enforced in the API layer, audit log, HTTPS, aggregated-by-default views. UMBC SSO (SAML/OIDC) is a stretch goal to confirm with the client. No direct PeopleSoft integration. | Sensitive student data and FERPA concerns |
+| Auth and security | Our own username and password login: argon2 password hashing, a signed 8-hour session in an httpOnly cookie, RBAC enforced in the API layer (admin, staff, leadership), audit log of uploads, HTTPS when hosted, aggregated-by-default views. UMBC SSO (SAML/OIDC) remains a possible later addition if the client asks. No direct PeopleSoft integration. | Sensitive student data and FERPA concerns |
 | Hosting and deployment | Local host or Docker first (hosting is decided later). Then frontend on Vercel or Netlify, backend and managed Postgres on Render or Railway. | Quick setup with CI/CD from GitHub. Production would need UMBC-approved hosting. |
 | CI/CD | GitHub Actions: lint (ruff, eslint), tests (pytest, Vitest), block merge on failure | Matches the team working agreement |
 | Testing | pytest (API and unit), Vitest and React Testing Library (UI), optional Playwright (end-to-end) | Supports testable tasks and the Definition of Done |
@@ -42,7 +42,7 @@ Three-tier layered web app: **React SPA (presentation), FastAPI REST API (busine
 
 ## Open decisions
 
-- Auth approach (own login or UMBC SSO), and which data sources and offices must be integrated.
+- Which data sources and offices must be integrated. (Auth is decided: our own login, with SSO as a possible later addition.)
 - TypeScript or plain JavaScript on the frontend.
 - Final hosting choice.
 - Confirmation of the whole stack by all teammates.

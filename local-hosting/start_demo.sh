@@ -3,6 +3,7 @@
 # Run from anywhere (Git Bash on Windows, or macOS/Linux):
 #   bash local-hosting/start_demo.sh
 # Add --keep-data to skip resetting the database to the sample year.
+# Also creates (or restores) the demo accounts admin, staff and dean.
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
@@ -46,11 +47,20 @@ for _ in $(seq 60); do
 done
 curl -sf http://localhost:8000/health >/dev/null || fail "The API did not answer. Check: docker compose logs backend"
 
+step "Creating the demo accounts (admin, staff, dean)"
+docker compose exec -T backend python -m app.demo_users || fail "Could not create the demo accounts."
+
 if [ "$KEEP_DATA" = true ]; then
   step "Keeping the existing data (--keep-data)"
 else
   step "Resetting the database to the 52 sample weeks"
-  curl -sf -X POST http://localhost:8000/testing/reset \
+  # Resetting is admin-only, so sign in as the demo admin first.
+  COOKIES="$(mktemp)"
+  trap 'rm -f "$COOKIES"' EXIT
+  curl -sf -c "$COOKIES" -o /dev/null http://localhost:8000/auth/login \
+    -H "Content-Type: application/json" -d '{"username": "admin", "password": "demo-admin-pass"}' \
+    || fail "Could not sign in as the demo admin."
+  curl -sf -b "$COOKIES" -X POST http://localhost:8000/testing/reset \
     -H "Content-Type: application/json" -d '{"load_sample": true}' || fail "Reset failed."
   echo
 fi
@@ -70,6 +80,11 @@ if curl -s -o /dev/null http://localhost:5173; then
   esac
   exit 0
 fi
+
+printf '\nSign in with one of the demo accounts:\n'
+echo "  admin / demo-admin-pass   (everything, including Users and Testing)"
+echo "  staff / demo-staff-pass   (uploads for Retriever Essentials)"
+echo "  dean  / demo-dean-pass    (leadership: view only)"
 
 step "Starting the website at http://localhost:5173 (Ctrl+C to stop)"
 npm run dev -- --port 5173 --strictPort --open

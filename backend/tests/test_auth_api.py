@@ -3,10 +3,12 @@ from datetime import UTC, datetime, timedelta
 import jwt
 import pytest
 from fastapi.testclient import TestClient
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.config import Settings
-from app.models import Office, Role
+from app.demo_users import DEMO_USERS, ensure_demo_users
+from app.models import Office, Role, StaffUser
 from app.security import SESSION_COOKIE, create_session_token, read_session_token
 from app.services.user_service import UserError, create_user
 from tests.conftest import TEST_PASSWORD, make_user, sign_in
@@ -142,3 +144,16 @@ def test_account_rules(
 def test_only_staff_keep_an_office(db: Session, office: Office) -> None:
     user = create_user(db, "boss", "long-enough", Role.LEADERSHIP, office.id)
     assert user.office_id is None
+
+
+def test_demo_accounts_are_created_and_restored(client: TestClient, db: Session) -> None:
+    ensure_demo_users(db)
+    for username, password, role in DEMO_USERS:
+        assert sign_in(client, username, password).json()["role"] == role
+
+    # Running it again undoes changes made during a demo.
+    staff = db.scalar(select(StaffUser).where(StaffUser.username == "staff"))
+    staff.is_active = False
+    db.commit()
+    ensure_demo_users(db)
+    sign_in(client, "staff", "demo-staff-pass")

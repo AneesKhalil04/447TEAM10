@@ -40,14 +40,14 @@ def reset(
     request: ResetRequest,
     db: Annotated[Session, Depends(get_db)],
     settings: Annotated[Settings, Depends(get_settings)],
-    _admin: AdminUser,
+    admin: AdminUser,
 ) -> ResetResponse:
     """Delete all uploaded data, then optionally reload the sample year. Disabled by default."""
     if not settings.enable_test_tools:
         raise HTTPException(
             status.HTTP_403_FORBIDDEN, "Test tools are turned off (set ENABLE_TEST_TOOLS=true)."
         )
-    result = reset_data(db, request.load_sample)
+    result = reset_data(db, request.load_sample, admin)
     return ResetResponse(
         deleted_uploads=result.deleted_uploads,
         deleted_rows=result.deleted_rows,

@@ -2,6 +2,7 @@
 # Run from anywhere:
 #   powershell -ExecutionPolicy Bypass -File local-hosting\start_demo.ps1
 # Add -KeepData to skip resetting the database to the sample year.
+# Also creates (or restores) the demo accounts admin, staff and dean.
 param([switch]$KeepData)
 
 # Native commands are checked through $LASTEXITCODE; "Stop" would treat their stderr as fatal in Windows PowerShell 5.1.
@@ -51,12 +52,19 @@ while (-not $ready -and (Get-Date) -lt $deadline) {
 }
 if (-not $ready) { Fail "The API did not answer. Check: docker compose logs backend" }
 
+Step "Creating the demo accounts (admin, staff, dean)"
+docker compose exec -T backend python -m app.demo_users
+if ($LASTEXITCODE -ne 0) { Fail "Could not create the demo accounts. See the messages above." }
+
 if ($KeepData) {
     Step "Keeping the existing data (-KeepData)"
 } else {
     Step "Resetting the database to the 52 sample weeks"
     try {
-        $result = Invoke-RestMethod -Method Post -Uri "http://localhost:8000/testing/reset" `
+        # Resetting is admin-only, so sign in as the demo admin first.
+        Invoke-RestMethod -Method Post -Uri "http://localhost:8000/auth/login" -SessionVariable admin `
+            -ContentType "application/json" -Body '{"username": "admin", "password": "demo-admin-pass"}' | Out-Null
+        $result = Invoke-RestMethod -Method Post -Uri "http://localhost:8000/testing/reset" -WebSession $admin `
             -ContentType "application/json" -Body '{"load_sample": true}'
     } catch {
         Fail "Reset failed: $($_.Exception.Message)"
@@ -76,6 +84,11 @@ if (Get-NetTCPConnection -LocalPort 5173 -State Listen -ErrorAction SilentlyCont
     Start-Process "http://localhost:5173"
     exit 0
 }
+
+Write-Host "`nSign in with one of the demo accounts:" -ForegroundColor Green
+Write-Host "  admin / demo-admin-pass   (everything, including Users and Testing)"
+Write-Host "  staff / demo-staff-pass   (uploads for Retriever Essentials)"
+Write-Host "  dean  / demo-dean-pass    (leadership: view only)"
 
 Step "Starting the website at http://localhost:5173 (Ctrl+C to stop)"
 npm run dev -- --port 5173 --strictPort --open

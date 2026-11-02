@@ -89,7 +89,9 @@ def validate_rows(
     if duplicates:
         return [], [RowError(1, column, "Column appears more than once.") for column in duplicates]
 
-    extra_columns = [column for column in header if column and column not in TEMPLATE_COLUMNS]
+    extra_columns = [
+        column for column in header if column and column not in TEMPLATE_COLUMNS
+    ]
     parsed: list[ParsedRow] = []
     errors: list[RowError] = []
 

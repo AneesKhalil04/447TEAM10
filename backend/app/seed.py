@@ -1,6 +1,6 @@
 """Create the pilot office and its data source. Safe to run more than once.
 
-python -m app.seed
+    python -m app.seed
 """
 
 from sqlalchemy import select
