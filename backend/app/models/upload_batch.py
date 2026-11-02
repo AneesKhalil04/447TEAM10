@@ -12,6 +12,7 @@ from app.db import Base
 if TYPE_CHECKING:
     from app.models.data_source import DataSource
     from app.models.service_usage import ServiceUsage
+    from app.models.staff_user import StaffUser
 
 
 class UploadStatus(enum.StrEnum):
@@ -42,8 +43,12 @@ class UploadBatch(Base):
     uploaded_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
     )
+    uploaded_by_id: Mapped[int | None] = mapped_column(
+        ForeignKey("staff_user.id", ondelete="SET NULL")
+    )
 
     data_source: Mapped[DataSource] = relationship(back_populates="upload_batches")
+    uploaded_by: Mapped[StaffUser | None] = relationship()
     usage_rows: Mapped[list[ServiceUsage]] = relationship(
         back_populates="upload_batch", cascade="all, delete-orphan"
     )

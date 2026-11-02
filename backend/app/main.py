@@ -1,13 +1,14 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routers import dashboard, data_sources, testing, uploads
+from app.routers import auth, dashboard, data_sources, testing, uploads
 
 app = FastAPI(title="Retriever Essentials Impact Dashboard API")
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173"],
+    allow_credentials=True,  # the session cookie
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -18,6 +19,7 @@ def health_check() -> dict[str, str]:
     return {"status": "ok"}
 
 
+app.include_router(auth.router)
 app.include_router(dashboard.router)
 app.include_router(data_sources.router)
 app.include_router(uploads.router)
