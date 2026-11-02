@@ -13,6 +13,7 @@ const firstUpload: UploadHistoryItem = {
   weeks_kept: 51,
   first_week: "2025-10-13",
   last_week: "2026-10-05",
+  uploaded_by: null,
 };
 const secondUpload: UploadHistoryItem = {
   ...firstUpload,
@@ -22,6 +23,7 @@ const secondUpload: UploadHistoryItem = {
   weeks_kept: 3,
   first_week: "2026-10-12",
   last_week: "2026-10-26",
+  uploaded_by: "jdoe",
 };
 
 describe("UploadPage", () => {
@@ -37,6 +39,8 @@ describe("UploadPage", () => {
     expect(screen.getByText(/once a month/)).toBeInTheDocument();
     expect(await screen.findByText("upload_sample.csv")).toBeInTheDocument();
     expect(screen.getByText(/of 52 \(rest replaced\)/)).toBeInTheDocument();
+    expect(screen.getByRole("columnheader", { name: "By" })).toBeInTheDocument();
+    expect(screen.getByText("Unknown")).toBeInTheDocument();
   });
 
   it("shows how the totals moved and refreshes the history after a save", async () => {

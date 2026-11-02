@@ -30,6 +30,7 @@ function UploadHistory({ items }: UploadHistoryProps) {
             <th>Weeks covered</th>
             <th className="num">Weeks</th>
             <th>Uploaded</th>
+            <th>By</th>
           </tr>
         </thead>
         <tbody>
@@ -45,6 +46,7 @@ function UploadHistory({ items }: UploadHistoryProps) {
                 )}
               </td>
               <td>{formatUploadedAt(item.uploaded_at)}</td>
+              <td>{item.uploaded_by ?? <span className="muted">Unknown</span>}</td>
             </tr>
           ))}
         </tbody>

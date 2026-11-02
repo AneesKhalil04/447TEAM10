@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { SESSION_EXPIRED_EVENT, apiFetch } from "./client";
 import { fetchDashboardSummary } from "./dashboard";
 
 function respond(status: number, body: unknown) {
@@ -35,5 +36,29 @@ describe("fetchDashboardSummary", () => {
     await expect(fetchDashboardSummary({ officeId: null, start: null, end: null })).rejects.toThrow(
       "Could not reach the server",
     );
+  });
+});
+
+describe("apiFetch", () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("sends the session cookie and announces an expired session", async () => {
+    const fetchMock = respond(401, { detail: "Please sign in." });
+    vi.stubGlobal("fetch", fetchMock);
+    const onExpired = vi.fn();
+    window.addEventListener(SESSION_EXPIRED_EVENT, onExpired);
+
+    await expect(fetchDashboardSummary({ officeId: null, start: null, end: null })).rejects.toThrow(
+      "Please sign in.",
+    );
+    expect(fetchMock.mock.calls[0][1]).toMatchObject({ credentials: "include" });
+    expect(onExpired).toHaveBeenCalledTimes(1);
+
+    // A wrong password at sign-in is not an expired session.
+    await apiFetch("/auth/login", { method: "POST" });
+    expect(onExpired).toHaveBeenCalledTimes(1);
+    window.removeEventListener(SESSION_EXPIRED_EVENT, onExpired);
   });
 });

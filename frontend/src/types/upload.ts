@@ -47,4 +47,6 @@ export interface UploadHistoryItem {
   weeks_kept: number;
   first_week: string | null;
   last_week: string | null;
+  /** Null for uploads made before sign-in existed, or by an account that was removed. */
+  uploaded_by: string | null;
 }
