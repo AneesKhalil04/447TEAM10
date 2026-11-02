@@ -10,6 +10,13 @@ export function formatFullDate(weekStart: string): string {
   return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" });
 }
 
+/** The week `count` weeks after (or, if negative, before) a YYYY-MM-DD week start. */
+export function shiftWeeks(weekStart: string, count: number): string {
+  const date = new Date(`${weekStart}T00:00:00Z`);
+  date.setUTCDate(date.getUTCDate() + count * 7);
+  return date.toISOString().slice(0, 10);
+}
+
 /** "Oct 12, 2026" for one week, "Oct 12, 2026 to Oct 26, 2026" for several. */
 export function formatWeekRange(firstWeek: string, lastWeek: string): string {
   if (firstWeek === lastWeek) return formatFullDate(firstWeek);

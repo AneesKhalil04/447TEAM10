@@ -258,14 +258,16 @@
   gap: 1rem;
 }
 
-.period-toggle {
+.period-toggle,
+.range-presets {
   display: inline-flex;
   border: 1px solid var(--border-line);
   border-radius: 6px;
   overflow: hidden;
 }
 
-.period-toggle button {
+.period-toggle button,
+.range-presets button {
   font: inherit;
   padding: 0.4rem 0.9rem;
   border: 0;
@@ -274,13 +276,19 @@
   cursor: pointer;
 }
 
-.period-toggle button + button {
+.period-toggle button + button,
+.range-presets button + button {
   border-left: 1px solid var(--border-line);
 }
 
-.period-toggle button[aria-pressed="true"] {
+.period-toggle button[aria-pressed="true"],
+.range-presets button[aria-pressed="true"] {
   background: var(--umbc-gold);
   font-weight: 600;
+}
+
+.range-presets {
+  align-self: flex-start;
 }
 
 .dash-empty {
