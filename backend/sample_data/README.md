@@ -1,10 +1,10 @@
 # Sample data
 
-`service_usage_sample.csv` is generated placeholder data, not real Retriever Essentials numbers. It follows the column layout the dashboard and upload pipeline are being built against: one row per office per week, with visit counts, unique students served, and pounds of food distributed.
+`service_usage_sample.csv` is generated placeholder data, not real Retriever Essentials numbers. It follows the column layout the dashboard and upload pipeline are being built against: one row per office per week, with visit counts, students served (that week's count, so a student who comes every week is counted each week), and pounds of food distributed.
 
-It exists so the frontend dashboard and the future upload pipeline have something realistic to run against before the client provides real sample data (see the open question in `docs/requirements-draft.md`). Replace it once real data is available.
+It exists so the dashboard and the upload pipeline have something realistic to run against before the client provides real sample data (see the open question in `docs/requirements-draft.md`). Replace it once real data is available.
 
-`upload_sample.csv` holds just the Retriever Essentials rows from that file, ready to upload after running `python -m app.seed`. Uploads are checked against the data source's office, so the full sample file, which also has Emergency Aid Program rows, is rejected with row-level errors.
+`upload_sample.csv` holds just the Retriever Essentials rows from that file. It is what **Testing > Reset to sample data** loads, and it can also be uploaded by hand by an admin or a Retriever Essentials staff account after running `python -m app.seed`. Uploads are checked against the data source's office, so the full sample file, which also has Emergency Aid Program rows, is rejected with row-level errors.
 
 ## Upload template
 
