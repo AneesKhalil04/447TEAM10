@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Login Page Options</title>
+<!--
+  Mock sign-in pages for the Retriever Essentials dashboard.
+  Static HTML only: nothing here talks to the backend.
+  Open this file in a browser and use the switcher at the top to compare options.
+-->
+<style>
+  :root {
+    --umbc-gold: #ffc72c;      /* same gold the app already uses */
+    --umbc-gold-deep: #fdb515; /* UMBC brand gold */
+    --umbc-black: #1c1c1c;
+    --ink: #000000;
+    --white: #ffffff;
+    --gray-100: #f4f4f4;
+    --gray-300: #d4d4d4;
+    --gray-600: #5c5c5c;
+    --error: #b3261e;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    color: var(--umbc-black);
+    background: var(--gray-100);
+  }
+
+  /* ---------- Option switcher (not part of the design) ---------- */
+  .switcher {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+    display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
+    padding: 8px 16px;
+    background: rgba(255,255,255,.95);
+    border-bottom: 1px solid var(--gray-300);
+    font-size: 13px;
+  }
+  .switcher strong { margin-right: 6px; }
+  .switcher button {
+    font: inherit; cursor: pointer;
+    padding: 5px 10px; border-radius: 999px;
+    border: 1px solid var(--gray-300); background: var(--white); color: var(--umbc-black);
+  }
+  .switcher button[aria-pressed="true"] {
+    background: var(--umbc-black); color: var(--umbc-gold); border-color: var(--umbc-black);
+  }
+  .option { display: none; min-height: 100vh; padding-top: 46px; }
+  .option.active { display: flex; }
+
+  /* ---------- Shared form pieces ---------- */
+  .brand-mark {
+    display: inline-grid; place-items: center;
+    width: 44px; height: 44px; border-radius: 9px;
+    background: var(--umbc-gold); color: var(--umbc-black);
+    font-weight: 800; font-size: 18px; letter-spacing: .5px;
+  }
+  .form { display: flex; flex-direction: column; gap: 6px; }
+  .form label { font-size: 13px; font-weight: 600; margin-top: 10px; }
+  .form input[type=text], .form input[type=password] {
+    font: inherit; padding: 10px 12px;
+    border: 1px solid var(--gray-300); border-radius: 6px;
+    background: var(--white); color: var(--umbc-black);
+  }
+  .form input:focus { outline: 3px solid var(--umbc-gold); outline-offset: 1px; border-color: var(--umbc-black); }
+  .row { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: 10px; font-size: 13px; flex-wrap: wrap; }
+  .row label { margin: 0; font-weight: 400; display: flex; align-items: center; gap: 6px; }
+  .row a { color: inherit; }
+  .btn {
+    font: inherit; font-weight: 700; cursor: pointer;
+    margin-top: 18px; padding: 11px 16px; border-radius: 6px;
+    border: 2px solid var(--umbc-black);
+    background: var(--umbc-black); color: var(--umbc-gold);
+  }
+  .btn:hover { background: #000; }
+  .btn.gold { background: var(--umbc-gold); color: var(--umbc-black); border-color: var(--umbc-gold); }
+  .btn.gold:hover { background: var(--umbc-gold-deep); border-color: var(--umbc-gold-deep); }
+  .btn.ghost { background: transparent; color: var(--umbc-black); }
+  .divider { display: flex; align-items: center; gap: 10px; margin: 14px 0 0; font-size: 12px; color: var(--gray-600); }
+  .divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: var(--gray-300); }
+  .hint { font-size: 13px; color: var(--gray-600); margin: 4px 0 0; }
+  .mock-msg { display: none; margin-top: 12px; padding: 10px 12px; border-radius: 6px; font-size: 13px;
+    background: #fff8e1; border: 1px solid var(--umbc-gold); color: var(--umbc-black); }
+  .mock-msg.show { display: block; }
+  .demo-accounts { margin-top: 16px; font-size: 12px; color: var(--gray-600); }
+  .demo-accounts code { background: var(--gray-100); padding: 1px 5px; border-radius: 4px; color: var(--umbc-black); }
+
+  /* ---------- Option A: Split screen ---------- */
+  #opt-a { background: var(--white); }
+  #opt-a .side {
+    flex: 1 1 50%;
+    background: var(--umbc-black); color: var(--white);
+    padding: 56px 48px; display: flex; flex-direction: column; justify-content: space-between;
+    position: relative; overflow: hidden;
+  }
+  #opt-a .side::after {
+    content: ""; position: absolute; right: -120px; bottom: -120px;
+    width: 340px; height: 340px; border-radius: 50%;
+    border: 36px solid var(--umbc-gold); opacity: .9;
+  }
+  #opt-a .side > * { position: relative; z-index: 1; }
+  #opt-a .side h1 { font-size: 40px; line-height: 1.1; margin: 28px 0 12px; max-width: 14ch; }
+  #opt-a .side h1 span { color: var(--umbc-gold); }
+  #opt-a .side p { color: #cfcfcf; max-width: 38ch; line-height: 1.5; margin: 0; }
+  #opt-a .side .foot { font-size: 12px; color: #9a9a9a; position: relative; z-index: 1; }
+  #opt-a .main { flex: 1 1 50%; display: grid; place-items: center; padding: 40px 24px; }
+  #opt-a .panel { width: 100%; max-width: 360px; }
+  #opt-a .panel h2 { font-size: 26px; margin: 0 0 4px; }
+  #opt-a .panel h2::after { content: ""; display: block; width: 44px; height: 4px; background: var(--umbc-gold); margin-top: 10px; border-radius: 2px; }
+
+  /* ---------- Option B: Card on black ---------- */
+  #opt-b {
+    background:
+      linear-gradient(135deg, transparent 0 70%, rgba(255,199,44,.12) 70% 100%),
+      var(--umbc-black);
+    align-items: center; justify-content: center; flex-direction: column; padding-left: 16px; padding-right: 16px;
+  }
+  #opt-b .card {
+    width: 100%; max-width: 400px; background: var(--white);
+    border-radius: 12px; overflow: hidden; box-shadow: 0 24px 60px rgba(0,0,0,.45);
+  }
+  #opt-b .card-top { height: 8px; background: var(--umbc-gold); }
+  #opt-b .card-body { padding: 32px 32px 28px; }
+  #opt-b .card-head { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+  #opt-b .card-head h2 { margin: 0; font-size: 20px; }
+  #opt-b .card-head small { display: block; color: var(--gray-600); font-size: 12px; }
+  #opt-b .below { color: #a8a8a8; font-size: 12px; margin-top: 18px; text-align: center; }
+  #opt-b .below a { color: var(--umbc-gold); }
+
+  /* ---------- Option C: Gold background, black card ---------- */
+  #opt-c {
+    background: var(--umbc-gold);
+    background-image: repeating-linear-gradient(-45deg, rgba(0,0,0,.035) 0 12px, transparent 12px 24px);
+    align-items: center; justify-content: center; padding-left: 16px; padding-right: 16px;
+  }
+  #opt-c .card {
+    width: 100%; max-width: 380px; background: var(--umbc-black); color: var(--white);
+    border-radius: 14px; padding: 34px 30px; box-shadow: 10px 10px 0 var(--ink);
+  }
+  #opt-c h2 { margin: 16px 0 2px; font-size: 24px; }
+  #opt-c .hint { color: #bdbdbd; }
+  #opt-c .form label { color: var(--umbc-gold); }
+  #opt-c .form input[type=text], #opt-c .form input[type=password] {
+    background: #2a2a2a; border-color: #3d3d3d; color: var(--white);
+  }
+  #opt-c .row a { color: var(--umbc-gold); }
+  #opt-c .row label { color: #ddd; }
+  #opt-c .demo-accounts { color: #a8a8a8; }
+  #opt-c .demo-accounts code { background: #2a2a2a; color: var(--umbc-gold); }
+
+  /* ---------- Option D: Campus portal (header bar + info column) ---------- */
+  #opt-d { flex-direction: column; background: var(--gray-100); }
+  #opt-d header {
+    background: var(--umbc-black); color: var(--white);
+    border-bottom: 5px solid var(--umbc-gold);
+    padding: 14px 24px; display: flex; align-items: center; gap: 12px;
+  }
+  #opt-d header .brand-mark { width: 36px; height: 36px; font-size: 14px; }
+  #opt-d header .title { font-weight: 700; }
+  #opt-d header .title small { display: block; font-weight: 400; color: #bdbdbd; font-size: 12px; }
+  #opt-d .content {
+    flex: 1; width: 100%; max-width: 920px; margin: 0 auto; padding: 40px 16px;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 28px; align-items: start;
+  }
+  #opt-d .box { background: var(--white); border: 1px solid var(--gray-300); border-radius: 8px; padding: 28px; }
+  #opt-d .box h2 { margin: 0 0 4px; font-size: 20px; }
+  #opt-d .info h3 { margin: 0 0 10px; font-size: 16px; }
+  #opt-d .info ul { margin: 0; padding: 0; list-style: none; }
+  #opt-d .info li { padding: 10px 0 10px 16px; border-left: 4px solid var(--umbc-gold); margin-bottom: 10px; background: var(--white); border-radius: 0 6px 6px 0; font-size: 14px; line-height: 1.4; }
+  #opt-d .info li strong { display: block; }
+  #opt-d footer { background: var(--umbc-black); color: #9a9a9a; text-align: center; font-size: 12px; padding: 14px; }
+
+  /* ---------- Option E: Minimal gold underline ---------- */
+  #opt-e { background: var(--white); align-items: center; justify-content: center; padding-left: 16px; padding-right: 16px; }
+  #opt-e .wrap { width: 100%; max-width: 340px; text-align: left; }
+  #opt-e .stripe { display: flex; height: 6px; margin-bottom: 28px; }
+  #opt-e .stripe span:first-child { flex: 2; background: var(--umbc-black); }
+  #opt-e .stripe span:last-child { flex: 1; background: var(--umbc-gold); }
+  #opt-e h2 { font-size: 30px; margin: 0; letter-spacing: -.5px; }
+  #opt-e .form input[type=text], #opt-e .form input[type=password] {
+    border: none; border-bottom: 2px solid var(--gray-300); border-radius: 0; padding: 10px 2px; background: transparent;
+  }
+  #opt-e .form input:focus { outline: none; border-bottom-color: var(--umbc-gold); }
+  #opt-e .btn { border-radius: 999px; }
+
+  /* ---------- Phone widths ---------- */
+  @media (max-width: 760px) {
+    #opt-a.active { flex-direction: column; }
+    #opt-a .side { padding: 28px 16px; flex: none; gap: 20px; }
+    #opt-a .side > * { position: relative; z-index: 1; }
+  #opt-a .side h1 { font-size: 28px; margin-top: 16px; }
+    #opt-a .side::after { width: 140px; height: 140px; border-width: 18px; right: -60px; top: -60px; bottom: auto; }
+    #opt-a .main { padding: 28px 16px; }
+    #opt-b .card-body, #opt-c .card { padding: 26px 20px; }
+    #opt-c .card { box-shadow: 6px 6px 0 var(--ink); }
+    #opt-d .content { grid-template-columns: 1fr; padding: 24px 16px; }
+    #opt-d .box { padding: 22px 18px; }
+    .switcher { padding: 8px 16px; }
+    .option { padding-top: 84px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="switcher" aria-label="Login page options">
+  <strong>Login options:</strong>
+  <button type="button" data-opt="a" aria-pressed="true">A · Split screen</button>
+  <button type="button" data-opt="b" aria-pressed="false">B · Card on black</button>
+  <button type="button" data-opt="c" aria-pressed="false">C · Gold &amp; bold</button>
+  <button type="button" data-opt="d" aria-pressed="false">D · Campus portal</button>
+  <button type="button" data-opt="e" aria-pressed="false">E · Minimal</button>
+</nav>
+
+<!-- Option A: Split screen -->
+<section class="option active" id="opt-a" aria-label="Option A">
+  <div class="side">
+    <div>
+      <span class="brand-mark">RE</span>
+      <h1>Retriever Essentials <span>Impact Dashboard</span></h1>
+      <p>One place to see the basic-needs support UMBC offices provide to students, week by week.</p>
+    </div>
+    <div class="foot">UMBC · Dean of Students Office</div>
+  </div>
+  <div class="main">
+    <div class="panel">
+      <h2>Sign in</h2>
+      <p class="hint">Use the username and password your administrator gave you.</p>
+      <form class="form" data-mock>
+        <label for="a-user">Username</label>
+        <input id="a-user" type="text" autocomplete="username" required>
+        <label for="a-pass">Password</label>
+        <input id="a-pass" type="password" autocomplete="current-password" required>
+        <div class="row">
+          <label><input type="checkbox"> Keep me signed in</label>
+          <a href="#" data-noop>Forgot password?</a>
+        </div>
+        <button class="btn" type="submit">Sign in</button>
+        <div class="mock-msg" role="status"></div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- Option B: Card on black -->
+<section class="option" id="opt-b" aria-label="Option B">
+  <div class="card">
+    <div class="card-top"></div>
+    <div class="card-body">
+      <div class="card-head">
+        <span class="brand-mark">RE</span>
+        <div>
+          <h2>Retriever Essentials</h2>
+          <small>Basic Needs Impact Dashboard</small>
+        </div>
+      </div>
+      <form class="form" data-mock>
+        <label for="b-user">Username</label>
+        <input id="b-user" type="text" autocomplete="username" required>
+        <label for="b-pass">Password</label>
+        <input id="b-pass" type="password" autocomplete="current-password" required>
+        <button class="btn gold" type="submit">Sign in</button>
+        <div class="divider">or</div>
+        <button class="btn ghost" type="button" data-sso>Sign in with UMBC myUMBC</button>
+        <div class="mock-msg" role="status"></div>
+      </form>
+    </div>
+  </div>
+  <p class="below">Need access? Contact the <a href="#" data-noop>Dean of Students Office</a>.</p>
+</section>
+
+<!-- Option C: Gold background, black card -->
+<section class="option" id="opt-c" aria-label="Option C">
+  <div class="card">
+    <span class="brand-mark">RE</span>
+    <h2>Welcome back, Retriever</h2>
+    <p class="hint">Sign in to view and upload office data.</p>
+    <form class="form" data-mock>
+      <label for="c-user">Username</label>
+      <input id="c-user" type="text" autocomplete="username" required>
+      <label for="c-pass">Password</label>
+      <input id="c-pass" type="password" autocomplete="current-password" required>
+      <div class="row">
+        <label><input type="checkbox"> Remember me</label>
+        <a href="#" data-noop>Forgot password?</a>
+      </div>
+      <button class="btn gold" type="submit">Sign in</button>
+      <div class="mock-msg" role="status"></div>
+    </form>
+    <div class="demo-accounts">Demo accounts: <code>admin</code> · <code>staff</code> · <code>viewer</code></div>
+  </div>
+</section>
+
+<!-- Option D: Campus portal -->
+<section class="option" id="opt-d" aria-label="Option D">
+  <header>
+    <span class="brand-mark">RE</span>
+    <div class="title">Retriever Essentials<small>Basic Needs Impact Dashboard · UMBC</small></div>
+  </header>
+  <div class="content">
+    <div class="box">
+      <h2>Sign in</h2>
+      <p class="hint">Staff and leadership accounts only.</p>
+      <form class="form" data-mock>
+        <label for="d-user">Username</label>
+        <input id="d-user" type="text" autocomplete="username" required>
+        <label for="d-pass">Password</label>
+        <input id="d-pass" type="password" autocomplete="current-password" required>
+        <button class="btn" type="submit">Sign in</button>
+        <div class="mock-msg" role="status"></div>
+      </form>
+    </div>
+    <div class="info">
+      <h3>What you can do here</h3>
+      <ul>
+        <li><strong>View the dashboard</strong>Weekly totals, trends and office breakdowns.</li>
+        <li><strong>Upload office data</strong>Submit CSV or Excel files with validation.</li>
+        <li><strong>Manage users</strong>Admins can add accounts and review activity.</li>
+      </ul>
+    </div>
+  </div>
+  <footer>UMBC · Dean of Students Office · Student data stays private</footer>
+</section>
+
+<!-- Option E: Minimal -->
+<section class="option" id="opt-e" aria-label="Option E">
+  <div class="wrap">
+    <div class="stripe"><span></span><span></span></div>
+    <h2>Sign in</h2>
+    <p class="hint">Retriever Essentials Impact Dashboard</p>
+    <form class="form" data-mock>
+      <label for="e-user">Username</label>
+      <input id="e-user" type="text" autocomplete="username" required>
+      <label for="e-pass">Password</label>
+      <input id="e-pass" type="password" autocomplete="current-password" required>
+      <button class="btn" type="submit">Continue</button>
+      <div class="mock-msg" role="status"></div>
+    </form>
+  </div>
+</section>
+
+<script>
+  // Switch between options; remember the choice in the URL hash.
+  const buttons = document.querySelectorAll(".switcher button");
+  function show(id) {
+    document.querySelectorAll(".option").forEach((el) => el.classList.toggle("active", el.id === "opt-" + id));
+    buttons.forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.opt === id)));
+    history.replaceState(null, "", "#" + id);
+  }
+  buttons.forEach((b) => b.addEventListener("click", () => show(b.dataset.opt)));
+  const start = location.hash.slice(1);
+  if (["a", "b", "c", "d", "e"].includes(start)) show(start);
+
+  // Mock behaviour only: no request is sent.
+  function say(form, text) {
+    const msg = form.querySelector(".mock-msg");
+    msg.textContent = text;
+    msg.classList.add("show");
+  }
+  document.querySelectorAll("form[data-mock]").forEach((form) => {
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const user = form.querySelector("input[type=text]").value.trim();
+      say(form, "Mock only: would sign in as “" + user + "”.");
+    });
+  });
+  document.querySelectorAll("[data-sso]").forEach((b) =>
+    b.addEventListener("click", () => say(b.closest("form"), "Mock only: single sign-on is not wired up.")));
+  document.querySelectorAll("[data-noop]").forEach((a) =>
+    a.addEventListener("click", (e) => e.preventDefault()));
+</script>
+</body>
+</html>
